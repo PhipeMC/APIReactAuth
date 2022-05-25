@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from 'react';
-import { NavItem, NavLink, Button } from 'reactstrap';
+import { NavItem, NavLink, Button, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import authService from './AuthorizeService';
 import { ApplicationPaths } from './ApiAuthorizationConstants';
+import ProfilePic from '../../Images/stone-cold-steve-austin-wwe.jpg';
 
 export class LoginMenu extends Component {
     constructor(props) {
@@ -46,12 +47,23 @@ export class LoginMenu extends Component {
 
     authenticatedView(userName, profilePath, logoutPath) {
         return (<Fragment>
-            <NavItem>
+            <UncontrolledDropdown>
+                <DropdownToggle caret nav className="text-muted">
+                    <img src={ProfilePic} alt="" className="rounded-circle avatar me-2" /> {userName}
+                </DropdownToggle>
+                <DropdownMenu className="text-dark" right>
+                    <DropdownItem><NavLink tag={Link} className="text-dark" to={profilePath}>Mi Perfil</NavLink></DropdownItem>
+                    <DropdownItem><NavLink className='text-dark'>Configuración</NavLink></DropdownItem>
+                    <DropdownItem divider></DropdownItem>
+                    <DropdownItem><NavLink tag={Link} className="text-dark" to={logoutPath}>Cerrar sesión</NavLink></DropdownItem>
+                </DropdownMenu>
+            </UncontrolledDropdown>
+            {/*<NavItem>
                 <NavLink tag={Link} className="text-dark" to={profilePath}>Hello {userName}</NavLink>
             </NavItem>
             <NavItem>
                 <NavLink tag={Link} className="text-dark" to={logoutPath}>Logout</NavLink>
-            </NavItem>
+        </NavItem>*/}
         </Fragment>);
 
     }
