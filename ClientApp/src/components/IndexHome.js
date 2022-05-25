@@ -1,54 +1,19 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import { Button, Container, Navbar, NavItem, NavLink } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { Button } from 'reactstrap';
 import { LoginMenu } from './api-authorization/LoginMenu';
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/NavMenu.css';
 import '../css/style.css';
-import image from '../Images/northwindLogoUnico.png';
 import Worktable from '../Images/Mesa de trabajo2.png';
 import Design from '../Images/Design stats-amico.svg';
 import Slpash from '../Images/pickawood-6tAIO3pxde4-unsplash.jpg';
 import Splash2 from '../Images/remy-gieling-qqtE2yX7POI-unsplash.jpg'
 
 export class IndexHome extends Component {
-
-    
-
     render() {
         return (
             <div>
                 <div className="startView">
-                    <header>
-                        <Navbar dark expand="md" full="true" className='bg-faded d-flex justify-content-center px-3'>
-                            <Container fluid>
-                                <a href='/' className='navbar-brand d-flex align-items-center w-50 me-auto fw-bold'>
-                                    <img src={image} width='25rem' height='25em' className='me-1' /> Northwind</a>
-                                <div className='navbar-collapse collapse w-100' id='collapsingNavbar3'>
-                                    <ul className='navbar-nav w-100 justify-content-center'>
-                                        <NavItem>
-                                            <NavLink tag={Link} className="" to="#caracteristicas2">Caracteristicas</NavLink>
-                                        </NavItem>
-                                        <NavItem>
-                                            <NavLink tag={Link} className="" to="#pricing">Planes</NavLink>
-                                        </NavItem>
-                                        <NavItem>
-                                            <NavLink tag={Link} className="" to="#soporte">FAQs</NavLink>
-                                        </NavItem>
-                                        <NavItem>
-                                            <NavLink tag={Link} className="" to="/suppliers">Empresa</NavLink>
-                                        </NavItem>
-                                    </ul>
-                                    <ul className='nav navbar-nav ms-auto w-100 justify-content-end'>
-                                        <Button color='primary' className='me-md-2 mb-1 mb-lg-0' outline>Registrate</Button>
-                                        <Button color='' className='btn-primary'>Inicia sesión</Button>
-                                    </ul>
-                                </div>
-                            </Container>
-                        </Navbar>
-
-                    </header>
                     <div id="inicio">
                         <div className="container col-xxl-8 overflow-hidden">
                             <div className="row flex-sm-row align-items-center g-5 py-5">
@@ -58,7 +23,7 @@ export class IndexHome extends Component {
                                         existencias
                                     </p>
                                     <div className="d-grid gap-2 d-md-flex justify-content-md-start">
-                                        <button type="button" className="btn btn-warning btn-lg px-4 me-md-2">Prueba gratis</button>
+                                        <Button type="button" className="btn btn-warning btn-lg px-4 me-md-2">Prueba gratis</Button>
                                         <a className="btn btn-light btn-lg px-4" href="#caracteristicas2">Descubre
                                             más</a>
                                     </div>

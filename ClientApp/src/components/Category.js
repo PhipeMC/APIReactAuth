@@ -65,7 +65,7 @@ export class Category extends Component {
                                     <Input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" />
                                     <Button className="btn btn-search position-absolute" type="submit"><BsSearch /></Button>
                                 </Form>
-                                <UncontrolledDropdown>
+                                {/*<UncontrolledDropdown>
                                     <DropdownToggle caret nav className="text-muted">
                                         <img src={Profile} alt="" className="rounded-circle avatar me-2" /> Austin
                                     </DropdownToggle>
@@ -75,7 +75,7 @@ export class Category extends Component {
                                         <DropdownItem divider></DropdownItem>
                                         <DropdownItem>Cerrar sesión</DropdownItem>
                                     </DropdownMenu>
-                                </UncontrolledDropdown>
+        </UncontrolledDropdown>*/}
                             </div>
                         </Navbar>
                         <div className="content">
