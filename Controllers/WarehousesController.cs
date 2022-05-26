@@ -2,11 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using APIReactAuth.Data;
 using APIReactAuth.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace InventoryWebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize(Policy = "RequireAdminRole")]
     [ApiController]
+    [Route("api/[controller]")]
     public class WarehousesController : ControllerBase
     {
         private readonly NorthwindContext _context;
@@ -17,6 +21,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Warehouses
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Warehouse>>> GetWarehouses()
         {
@@ -28,6 +33,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Warehouses/5
+        [Authorize(Roles = "ADMINISTRADOR")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Warehouse>> GetWarehouse(int id)
         {
