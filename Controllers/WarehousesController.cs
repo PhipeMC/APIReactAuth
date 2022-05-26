@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace InventoryWebApi.Controllers
 {
-    //[Authorize(Policy = "RequireAdminRole")]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class WarehousesController : ControllerBase
@@ -21,6 +21,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Warehouses
+        //[Authorize(Policy = "RequireAdminRole")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Warehouse>>> GetWarehouses()
         {
@@ -32,6 +33,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Warehouses/5
+        //[Authorize(Policy = "RequireAdminRole")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Warehouse>> GetWarehouse(int id)
         {
@@ -51,6 +53,7 @@ namespace InventoryWebApi.Controllers
 
         // PUT: api/Warehouses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[Authorize(Policy = "RequireAdminRole")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutWarehouse(int id, Warehouse warehouse)
         {
@@ -82,6 +85,7 @@ namespace InventoryWebApi.Controllers
 
         // POST: api/Warehouses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[Authorize(Policy = "RequireAdminRole")]
         [HttpPost]
         public async Task<ActionResult<Warehouse>> PostWarehouse(Warehouse warehouse)
         {
@@ -96,6 +100,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // DELETE: api/Warehouses/5
+        //[Authorize(Policy = "RequireAdminRole")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWarehouse(int id)
         {

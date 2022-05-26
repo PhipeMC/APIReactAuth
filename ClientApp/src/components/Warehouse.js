@@ -1,20 +1,15 @@
 import { Component, useEffect, useState } from "react";
 import {
-    Button, Form, Navbar, Input, UncontrolledDropdown, DropdownToggle,
-    DropdownMenu, DropdownItem, Card, CardBody, CardTitle, CardSubtitle,
+    Button, Form, Navbar, Input, Card, CardBody, CardTitle, CardSubtitle,
     CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Table
 } from "reactstrap";
 import {
-    BsPlusLg, BsSearch, BsFillDiagram3Fill, BsBasketFill, BsBoxSeam,
+    BsPlusLg, BsSearch, BsBasketFill, BsBoxSeam,
     BsListStars, BsInboxesFill, BsTable, BsPencilFill
 } from "react-icons/bs";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/transactions.css';
-import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Logo from '../Images/northwindLogoUnico.png';
-import Profile from '../Images/stone-cold-steve-austin-wwe.jpg';
-import { post } from "jquery";
 
 
 export class Warehouse extends Component {
