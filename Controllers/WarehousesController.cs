@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace InventoryWebApi.Controllers
 {
-    [Authorize(Policy = "RequireAdminRole")]
+    //[Authorize(Policy = "RequireAdminRole")]
     [ApiController]
     [Route("api/[controller]")]
     public class WarehousesController : ControllerBase
@@ -21,7 +21,6 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Warehouses
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Warehouse>>> GetWarehouses()
         {
@@ -33,7 +32,6 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Warehouses/5
-        [Authorize(Roles = "ADMINISTRADOR")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Warehouse>> GetWarehouse(int id)
         {
