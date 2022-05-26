@@ -7,6 +7,7 @@ using IdentityModel;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,10 @@ builder.Services.AddAuthorization(options =>
     {
         policy.RequireClaim(ClaimTypes.Role, new String[] { "ADMINISTRADOR", "GERENTE" });
     });
+    options.AddPolicy("OnlyAdmin", policy =>
+    {
+        policy.RequireClaim(ClaimTypes.Role, new String[] { "ADMINISTRADOR"});
+    });
 });
 
 builder.Services.AddControllersWithViews();
@@ -101,6 +106,6 @@ app.MapControllerRoute(
     pattern: "{controller}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-app.MapFallbackToFile("index.html"); ;
+app.MapFallbackToFile("index.html");
 
 app.Run();
