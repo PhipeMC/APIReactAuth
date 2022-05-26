@@ -15,7 +15,7 @@ export class NavMenu extends Component {
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
-      collapsed: true, isUserValid: false
+      collapsed: true, isUserValid: false, isUserConnected: false,
     };
   }
 
@@ -29,7 +29,7 @@ export class NavMenu extends Component {
     authService.getUser().then(
       (u) => {
         console.log(u);
-        const valo = authService.isAdmin(u);
+        const valo = authService.isValidUser(u);
         console.log(valo);
         this.setState({ isUserValid: valo });
         console.log(valo);

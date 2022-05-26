@@ -15,6 +15,10 @@ export class AuthorizeService {
         return this.isInAnyRole(user, ["ADMINISTRADOR"]);
     }
 
+    isGerente(user) {
+        return this.isInAnyRole(user, ["GERENTE"]);
+    }
+
     isValidUser(user) {
         return this.isInAnyRole(user, ["ADMINISTRADOR", "GERENTE"]);
     }
