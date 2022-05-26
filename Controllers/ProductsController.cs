@@ -111,6 +111,32 @@ namespace InventoryWebApi.Controllers
             return NoContent();
         }
 
+        /*[HttpGet]
+        public async Task<ActionResult> GetMaxProduct()
+        {
+            if (_context.Products == null)
+            {
+                return NotFound();
+            }
+            var product =
+                (from wp in _context.Warehouseproducts
+                join p in _context.Products
+                on wp.ProductId equals p.ProductId
+                orderby wp.UnitsInStock descending
+                where wp.Discontinued != 0
+                select new {
+                    Name = p.ProductName,
+                    Quantity = wp.UnitsInStock
+                }).Take(1);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return product;
+        }*/
+
         private bool ProductExists(int id)
         {
             return (_context.Products?.Any(e => e.ProductId == id)).GetValueOrDefault();

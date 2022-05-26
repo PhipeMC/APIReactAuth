@@ -1,24 +1,22 @@
 import { Component } from "react";
 import {
-    Button, Form, Navbar, Input, UncontrolledDropdown, DropdownToggle,
-    DropdownMenu, DropdownItem, Card, CardBody, CardTitle, CardSubtitle,
+    Button, Form, Navbar, Input, Card, CardBody, CardTitle, CardSubtitle,
     CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Table
 } from "reactstrap";
 import {
-    BsPlusLg, BsSearch, BsFillDiagram3Fill, BsBasketFill, BsBoxSeam,
+    BsPlusLg, BsSearch, BsBasketFill, BsBoxSeam,
     BsListStars, BsInboxesFill, BsTable, BsPencilFill
 } from "react-icons/bs";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/transactions.css';
-import Logo from '../Images/northwindLogoUnico.png';
-import Profile from '../Images/stone-cold-steve-austin-wwe.jpg';
+import authService from './api-authorization/AuthorizeService';
 
 export class Transaction extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            modal: false, data: []
+            modal: false, data: [], isUserValid: false, isGerente: false
         };
 
         this.toggle = this.toggle.bind(this);
@@ -32,6 +30,15 @@ export class Transaction extends Component {
         }).catch(function (error) {
             console.log(error);
         })
+
+        authService.getUser().then(
+            (u) => {
+                const valo = authService.isValidUser(u);
+                const role = authService.isGerente(u);
+                this.setState({ isGerente: role });
+                this.setState({ isUserValid: valo });
+            }
+        );
     }
 
     toggle() {
@@ -46,7 +53,6 @@ export class Transaction extends Component {
                 <div className="d-flex">
                     <div className="sidebar-container sidebar-color d-none d-md-block">
                         <div className="menu">
-                            {/*<a href="/" className="d-block p-3 text-white active"><BsFillDiagram3Fill className="me-2 lead" /> Compañias</a>*/}
                             <a href="/suppliers" className="d-block p-3 text-white selected"><BsBasketFill className="me-2 lead" /> Proveedores</a>
                             <a href="/warehouses" className="d-block p-3 text-white"><BsInboxesFill className="me-2 lead" /> Almacenes</a>
                             <a href="/movements" className="d-block p-3 text-white"><BsTable className="me-2 lead" /> Movimientos</a>
@@ -61,17 +67,6 @@ export class Transaction extends Component {
                                     <Input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" />
                                     <Button className="btn btn-search position-absolute" type="submit"><BsSearch /></Button>
                                 </Form>
-                                {/*<UncontrolledDropdown>
-                                    <DropdownToggle caret nav className="text-muted">
-                                        <img src={Profile} alt="" className="rounded-circle avatar me-2" /> Austin
-                                    </DropdownToggle>
-                                    <DropdownMenu className="text-dark" right>
-                                        <DropdownItem>Mi Perfil</DropdownItem>
-                                        <DropdownItem>Configuración</DropdownItem>
-                                        <DropdownItem divider></DropdownItem>
-                                        <DropdownItem>Cerrar sesión</DropdownItem>
-                                    </DropdownMenu>
-        </UncontrolledDropdown>*/}
                             </div>
                         </Navbar>
                         <div className="content">
@@ -79,7 +74,7 @@ export class Transaction extends Component {
                                 <div className="container">
                                     <div className="row">
                                         <div className="col-lg-9">
-                                            <h1 className="fw-bold mb-0 text-dark">Bienvenido Austin</h1>
+                                            <h1 className="fw-bold mb-0 text-dark">Bienvenido</h1>
                                             <p className="lead text-muted">Revisa la ultima información de movimientos</p>
                                         </div>
                                     </div>
@@ -110,9 +105,13 @@ export class Transaction extends Component {
                             </section>
                             <div style={{ backgroundcolor: "#0055FF" }}>
                                 <div className="py-3 my-5 bg-light mx-5 px-3">
-                                    <div>
-                                        <Button color="primary" onClick={this.toggle}><BsPlusLg /> Agregar </Button>
-                                    </div>
+                                    {
+                                        this.state.isUserValid &&
+                                        <div>
+                                            <Button color="primary" onClick={this.toggle}><BsPlusLg /> Agregar </Button>
+                                        </div>
+                                    }
+
                                     <div>
                                         <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} centered>
                                             <ModalHeader toggle={this.toggle} className="text-dark" close={<Button onClick={this.toggle} className="btn-close"></Button>}>Agregar Proveedor</ModalHeader>
@@ -180,7 +179,7 @@ export class Transaction extends Component {
                                         </thead>
                                         <tbody>
                                             {
-                                                this.state.data.map(suppliers => 
+                                                this.state.data.map(suppliers =>
                                                     //console.log(suppliers);
                                                     <tr key={suppliers.supplierId}>
                                                         <th scope="row">{suppliers.supplierId}</th>
@@ -194,55 +193,55 @@ export class Transaction extends Component {
                                                         <td className="text-center"><Button type="button" onClick={this.toggle} className="btn btn-primary">
                                                             <BsPencilFill /></Button>
                                                             <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} centered>
-                                            <ModalHeader toggle={this.toggle} className="text-dark" close={<Button onClick={this.toggle} className="btn-close"></Button>}>Agregar Proveedor</ModalHeader>
-                                            <ModalBody className="text-dark">
-                                                <Form>
-                                                    <FormGroup>
-                                                        <label for="txt-company">ID de la compañia</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <label for="txt-company">Nombre de la compañia</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="Empresa-X" />
-                                                    </FormGroup>
+                                                                <ModalHeader toggle={this.toggle} className="text-dark" close={<Button onClick={this.toggle} className="btn-close"></Button>}>Agregar Proveedor</ModalHeader>
+                                                                <ModalBody className="text-dark">
+                                                                    <Form>
+                                                                        <FormGroup>
+                                                                            <label for="txt-company">ID de la compañia</label>
+                                                                            <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
+                                                                        </FormGroup>
+                                                                        <FormGroup>
+                                                                            <label for="txt-company">Nombre de la compañia</label>
+                                                                            <input type="text" className="form-control mb-3" placeholder="Empresa-X" />
+                                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <label for="txt-company">Nombre del proovedor</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="Juan López Zavala" />
-                                                    </FormGroup>
+                                                                        <FormGroup>
+                                                                            <label for="txt-company">Nombre del proovedor</label>
+                                                                            <input type="text" className="form-control mb-3" placeholder="Juan López Zavala" />
+                                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <label for="txt-address">Direccion del proovedor</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="Prolongacion Emiliano Zapata 654" />
-                                                    </FormGroup>
+                                                                        <FormGroup>
+                                                                            <label for="txt-address">Direccion del proovedor</label>
+                                                                            <input type="text" className="form-control mb-3" placeholder="Prolongacion Emiliano Zapata 654" />
+                                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <label for="txt-city">Ciudad</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="Morelia" />
-                                                    </FormGroup>
+                                                                        <FormGroup>
+                                                                            <label for="txt-city">Ciudad</label>
+                                                                            <input type="text" className="form-control mb-3" placeholder="Morelia" />
+                                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <label for="txt-cp">Codigo postal</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="384571" />
-                                                    </FormGroup>
+                                                                        <FormGroup>
+                                                                            <label for="txt-cp">Codigo postal</label>
+                                                                            <input type="text" className="form-control mb-3" placeholder="384571" />
+                                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <label for="txt-country">Pais</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="México" />
-                                                    </FormGroup>
+                                                                        <FormGroup>
+                                                                            <label for="txt-country">Pais</label>
+                                                                            <input type="text" className="form-control mb-3" placeholder="México" />
+                                                                        </FormGroup>
 
-                                                    <FormGroup>
-                                                        <label for="txt-phone">Telefono de contacto</label>
-                                                        <input type="tel" className="form-control mb-3" placeholder="XXX-XXX-XX-XX" />
-                                                    </FormGroup>
-                                                </Form>
-                                            </ModalBody>
-                                            <ModalFooter>
-                                                <Button color="primary" onClick={this.toggle}>Agregar</Button>
-                                                <Button color="secondary" onClick={this.toggle}>Cancelar</Button>
-                                            </ModalFooter>
-                                        </Modal>
-                                                            </td>
+                                                                        <FormGroup>
+                                                                            <label for="txt-phone">Telefono de contacto</label>
+                                                                            <input type="tel" className="form-control mb-3" placeholder="XXX-XXX-XX-XX" />
+                                                                        </FormGroup>
+                                                                    </Form>
+                                                                </ModalBody>
+                                                                <ModalFooter>
+                                                                    <Button color="primary" onClick={this.toggle}>Agregar</Button>
+                                                                    <Button color="secondary" onClick={this.toggle}>Cancelar</Button>
+                                                                </ModalFooter>
+                                                            </Modal>
+                                                        </td>
                                                     </tr>
                                                 )
                                             }
