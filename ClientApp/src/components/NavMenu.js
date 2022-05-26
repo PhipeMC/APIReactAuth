@@ -5,6 +5,7 @@ import { LoginMenu } from './api-authorization/LoginMenu';
 import './NavMenu.css';
 import image from '../Images/northwindLogoUnico.png';
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import authService from './api-authorization/AuthorizeService';
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
@@ -14,7 +15,7 @@ export class NavMenu extends Component {
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
-      collapsed: true
+      collapsed: true, isUserValid: false
     };
   }
 
@@ -22,6 +23,18 @@ export class NavMenu extends Component {
     this.setState({
       collapsed: !this.state.collapsed
     });
+  }
+
+  componentDidMount() {
+    authService.getUser().then(
+      (u) => {
+        console.log(u);
+        const valo = authService.isAdmin(u);
+        console.log(valo);
+        this.setState({ isUserValid: valo });
+        console.log(valo);
+      }
+    );
   }
 
   render() {
@@ -54,9 +67,11 @@ export class NavMenu extends Component {
               <img src={image} width='25rem' height='25em' className='me-1' /> Northwind</a>
             <div className='navbar-collapse collapse w-100' id='collapsingNavbar3'>
               <ul className='navbar-nav w-100 justify-content-center'>
-                <NavItem>
-                  <NavLink tag={Link} className="" to="/suppliers">Inventario</NavLink>
-                </NavItem>
+                {
+                  this.state.isUserValid && <NavItem>
+                    <NavLink tag={Link} className="" to="/suppliers">Inventario</NavLink>
+                  </NavItem>
+                }
               </ul>
               <ul className='nav navbar-nav ms-auto w-100 justify-content-end'>
                 <LoginMenu>

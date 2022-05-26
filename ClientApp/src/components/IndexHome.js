@@ -8,8 +8,28 @@ import Worktable from '../Images/Mesa de trabajo2.png';
 import Design from '../Images/Design stats-amico.svg';
 import Slpash from '../Images/pickawood-6tAIO3pxde4-unsplash.jpg';
 import Splash2 from '../Images/remy-gieling-qqtE2yX7POI-unsplash.jpg'
+import authService from './api-authorization/AuthorizeService';
 
 export class IndexHome extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { isUserValid: false }
+    }
+
+    componentDidMount() {
+        authService.getUser().then(
+            (u) => {
+                console.log(u);
+                const valo = authService.isAdmin(u);
+                console.log(valo);
+                this.setState({ isUserValid: valo });
+                console.log(valo);
+            }
+
+        );
+    }
+
     render() {
         return (
             <div>
