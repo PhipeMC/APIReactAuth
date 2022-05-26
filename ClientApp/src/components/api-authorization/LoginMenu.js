@@ -3,7 +3,7 @@ import { NavItem, NavLink, Button, UncontrolledDropdown, DropdownToggle, Dropdow
 import { Link } from 'react-router-dom';
 import authService from './AuthorizeService';
 import { ApplicationPaths } from './ApiAuthorizationConstants';
-import ProfilePic from '../../Images/stone-cold-steve-austin-wwe.jpg';
+import ProfilePic from '../../Images/1653504606800.jpg';
 
 export class LoginMenu extends Component {
     constructor(props) {
