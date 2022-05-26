@@ -22,7 +22,7 @@ export class Warehouse extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            modal: false, modal2: false, data: [],accion: 0, id: 0,
+            modal: false, modal2: false, data: [], accion: 0, id: 0,
             description: "", address: ""
         };
         this.handleClick = this.handleClick.bind(this);
@@ -56,53 +56,55 @@ export class Warehouse extends Component {
                         console.log(code);
 
                         const warehouses = Array.from(this.state.data);
-                        warehouses.push({ warehouseId: warehouse.warehouseId, 
-                                        description: warehouse.description,
-                                        address: warehouse.address});
+                        warehouses.push({
+                            warehouseId: warehouse.warehouseId,
+                            description: warehouse.description,
+                            address: warehouse.address
+                        });
                         this.componentDidMount();
                         this.setState({ accion: 0 });
 
                     }
                 }
             );
+    }
+
+    handleClick() {
+        /*console.log('this is:', this);
+        console.log('e:', e.target);
+        console.log('e:', e);*/
+        //this.setState({ modalUpdate: true });
+        const warehouse = {
+            //WarehouseId: null,
+            Description: this.state.description,
+            Address: this.state.address,
+            CompanyId: 1
+        };
+
+        console.log(warehouse);
+
+        switch (this.state.accion) {
+            case 1:
+                this.create(warehouse);
+                break;
+
+            case 2:
+                this.edit(warehouse);
+                break;
         }
 
-        handleClick() {
-            /*console.log('this is:', this);
-            console.log('e:', e.target);
-            console.log('e:', e);*/
-            //this.setState({ modalUpdate: true });
-            const warehouse = {
-                //WarehouseId: null,
-                Description: this.state.description,
-                Address: this.state.address,
-                CompanyId: 1
-            };
-    
-            console.log(warehouse);
-    
-            switch (this.state.accion) {
-                case 1:
-                    this.create(warehouse);
-                    break;
-    
-                case 2:
-                    this.edit(warehouse);
-                    break;
-            }
-    
+    }
+
+    handleChange = (e) => {
+        if (e.target.name == 'warehouseId') {
+            const alm = Array.from(e.target.selectedOptions, option => option.value);
+            console.log(alm);
+            this.setState({ warehouseId: alm });
+            console.log(this.state);
+        } else {
+            this.setState({ [e.target.name]: e.target.value });
         }
-    
-        handleChange = (e) => {
-            if (e.target.name == 'warehouseId') {
-                const alm = Array.from(e.target.selectedOptions, option => option.value);
-                console.log(alm);
-                this.setState({ warehouseId: alm });
-                console.log(this.state);
-            }else {
-                this.setState({ [e.target.name]: e.target.value });
-            }
-        };
+    };
 
     mitoogle = () => {
         this.setState({ accion: 0 });
@@ -119,10 +121,6 @@ export class Warehouse extends Component {
             <div>
                 <div className="d-flex">
                     <div className="sidebar-container sidebar-color d-none d-md-block">
-                        <div className="logo">
-                            <h2 className="m-0 fw-bold" style={{ color: "#FFFFFF" }}><img src={Logo} width="25em"
-                                height="25em" className="pb-1" /> Northwind</h2>
-                        </div>
                         <div className="menu">
                             {/*<a href="/" className="d-block p-3 text-white active"><BsFillDiagram3Fill className="me-2 lead" /> Compañias</a>*/}
                             <a href="/suppliers" className="d-block p-3 text-white"><BsBasketFill className="me-2 lead" /> Proveedores</a>
@@ -139,17 +137,6 @@ export class Warehouse extends Component {
                                     <Input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" />
                                     <Button className="btn btn-search position-absolute" type="submit"><BsSearch /></Button>
                                 </Form>
-                                {/*<UncontrolledDropdown>
-                                    <DropdownToggle caret nav className="text-muted">
-                                        <img src={Profile} alt="" className="rounded-circle avatar me-2" /> Austin
-                                    </DropdownToggle>
-                                    <DropdownMenu className="text-dark" right>
-                                        <DropdownItem>Mi Perfil</DropdownItem>
-                                        <DropdownItem>Configuración</DropdownItem>
-                                        <DropdownItem divider></DropdownItem>
-                                        <DropdownItem>Cerrar sesión</DropdownItem>
-                                    </DropdownMenu>
-        </UncontrolledDropdown>*/}
                             </div>
                         </Navbar>
                         <div className="content">

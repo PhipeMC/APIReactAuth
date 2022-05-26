@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace APIReactAuth.Models
 {
@@ -32,11 +33,17 @@ namespace APIReactAuth.Models
         public int CompanyId { get; set; }
         public int EmployeeId { get; set; }
 
-        public virtual Company Company { get; set; } = null!;
-        public virtual Employee Employee { get; set; } = null!;
-        public virtual Warehouse OriginWarehouse { get; set; } = null!;
+        [JsonIgnore]
+        public virtual Company? Company { get; set; } = null!;
+        [JsonIgnore]
+        public virtual Employee? Employee { get; set; } = null!;
+        [JsonIgnore]
+        public virtual Warehouse? OriginWarehouse { get; set; } = null!;
+        [JsonIgnore]
         public virtual Supplier? Supplier { get; set; }
+        [JsonIgnore]
         public virtual Warehouse? TargetWarehouse { get; set; }
-        public virtual ICollection<Movementdetail> Movementdetails { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Movementdetail>? Movementdetails { get; set; }
     }
 }
