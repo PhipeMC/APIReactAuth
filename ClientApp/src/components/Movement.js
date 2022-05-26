@@ -37,7 +37,6 @@ export class Movement extends Component {
             movEditable: {}
         };
 
-        //this.toggle = this.toggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -159,18 +158,30 @@ export class Movement extends Component {
                 );
         }
         else if (this.state.accion == 2) {
+            var fecha = this.state.dateMov + "T00:00:00.000Z"
+
             var movimiento = {
                 movementId: this.state.movementId,
-                date: this.state.movEditable.date,
-                supplierId: this.state.movEditable.supplierId,
-                originWarehouseId: this.state.movEditable.originWarehouseId,
-                targetWarehouseId: this.state.movEditable.targetWarehouseId,
-                type: this.state.movEditable.type,
-                notes: this.state.movEditable.notes,
-                companyId: 1,
-                employeeId: this.state.movEditable.employeeId
+                date: fecha,
+                supplierId: this.state.provName,
+                originWarehouseId: this.state.sourceWare,
+                targetWarehouseId: this.state.targetWare,
+                type: this.state.typeMov,
+                notes: this.state.notesMov,
+                companyId: this.state.compania,
+                employeeId: this.state.empId
             }
-
+            /*
+            console.log(movimiento.movementId);
+            console.log(movimiento.date);
+            console.log(movimiento.supplierId);
+            console.log(movimiento.originWarehouseId);
+            console.log(movimiento.targetWarehouseId);
+            console.log(movimiento.type);
+            console.log(movimiento.notes);
+            console.log(movimiento.companyId);
+            console.log(movimiento.empId);
+*/
             const options = {
                 method: "PUT",
                 headers: {
@@ -241,8 +252,20 @@ export class Movement extends Component {
         fetch('/api/movements/' + item.movementId)
             .then(response => { return response.json() })
             .then(o => {
-                console.log("primer fetch "+ o);
-                this.setState({ accion: 2, movEditable: o, movementId: o.movementId })
+                console.log("primer fetch " + o);
+                this.setState({
+                    accion: 2,
+                    movementId: o.movementId,
+                    dateMov: o.date.slice(0, 10),
+                    provName: o.supplierId,//foranea
+                    sourceWare: o.originWarehouseId,//foranea
+                    targetWare: o.targetWarehouseId,//foranea
+                    typeMov: o.type,
+                    notesMov: o.notes,
+                    empId: o.employeeId,//foranea
+                    compania: o.companyId,
+                    movEditable: o,
+                });
             });
     }
 
@@ -252,7 +275,7 @@ export class Movement extends Component {
             .then(response => { return response.json() })
             .then(o => {
                 console.log(o);
-                this.setState({ accion: 3, movEditable: o, movementId: o.movementId })
+                this.setState({ accion: 3, movEditable: o, movementId: o.movementId, typeMov: o.type })
             });
     }
 
@@ -318,6 +341,45 @@ export class Movement extends Component {
                                     <div>
                                         <Button color="primary" onClick={this.mostrarInsertar}><BsPlusLg /> Agregar </Button>
                                     </div>
+                                    <table id="example" className="table dt-responsive nowrap align-middle px-2">
+                                        <thead>
+                                            <tr>
+                                                <th>Clave</th>
+                                                <th>Fecha</th>
+                                                <th>Proovedor</th>
+                                                <th>Almacen origen</th>
+                                                <th>Almacen destino</th>
+                                                <th>Tipo de movimiento</th>
+                                                <th>Notas</th>
+                                                <th>Empleado</th>
+                                                <th className="text-center">Operacion</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                this.state.data.map(movements =>
+                                                    <tr key={movements.movementId}>
+                                                        <th scope="row">{movements.movementId}</th>
+                                                        <td>{movements.date}</td>
+                                                        <td>{movements.supplierId}</td>
+                                                        <td>{movements.originWarehouseId}</td>
+                                                        <td>{movements.targetWarehouseId}</td>
+                                                        <td>{movements.type}</td>
+                                                        <td>{movements.notes}</td>
+                                                        <td>{movements.companyId}</td>
+                                                        <td className="text-center">
+                                                            <button type="button" className="btn btn-primary" onClick={() => this.editar(movements)}>
+                                                                <BsPencilFill />
+                                                            </button>
+                                                            <button type="button" className="btn btn-danger" onClick={() => this.eliminar(movements)}>
+                                                                <BsFillTrashFill />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            }
+                                        </tbody>
+                                    </table>
                                     <div>
                                         <Modal
                                             isOpen={this.state.accion > 0 && this.state.accion < 3 && true}
@@ -325,7 +387,7 @@ export class Movement extends Component {
                                             className={this.props.className}
                                             centered
                                         >
-                                            <ModalHeader toggle={this.mitoggle} className="text-dark" close={<Button onClick={this.mitoggle} className="btn-close"></Button>}>Agregar Movimiento</ModalHeader>
+                                            <ModalHeader toggle={this.mitoggle} className="text-dark" close={<Button onClick={this.mitoggle} className="btn-close"></Button>}>Movimiento</ModalHeader>
                                             <ModalBody className="text-dark">
                                                 <Form>
                                                     <FormGroup>
@@ -384,10 +446,10 @@ export class Movement extends Component {
                                                         <label for="typeMov">Tipo de movimiento*</label>
                                                         <select id="typeMov" name="typeMov" class="form-select mb-3" aria-label="Default select example" onChange={this.handleChange} value={this.state.typeMov} >
                                                             <option>Selecciona...</option>
-                                                            <option value={'compra'} >COMPRA</option>
-                                                            <option value={'traspaso'}>TRASPASO</option>
-                                                            <option value={'ajuste'}>AJUSTE</option>
-                                                            <option value={'venta'}>VENTA</option>
+                                                            <option value={'COMPRA'} >COMPRA</option>
+                                                            <option value={'TRASPASO'}>TRASPASO</option>
+                                                            <option value={'AJUSTE'}>AJUSTE</option>
+                                                            <option value={'VENTA'}>VENTA</option>
                                                         </select>
                                                     </FormGroup>
 
@@ -424,7 +486,22 @@ export class Movement extends Component {
                                                 Eliminar
                                             </ModalHeader>
                                             <ModalBody className="text-dark">
-                                                ¿Desea eliminar el elemento?
+                                                ¿Desea elimninar?
+                                                <Row>
+                                                    <Col md={2}>
+                                                        <FormGroup>
+                                                            <label for="elimination">ID</label>
+                                                            <input id="elimination" name="elimination" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.movementId} />
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col md={10}>
+                                                        <FormGroup>
+                                                            <label for="movimiento">Tipo de movimiento</label>
+                                                            <input id="movimiento" name="movimiento" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.typeMov} />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
                                             </ModalBody>
                                             <ModalFooter>
                                                 <Button
@@ -441,45 +518,6 @@ export class Movement extends Component {
                                         </Modal>
 
                                     </div>
-                                    <table id="example" className="table dt-responsive nowrap align-middle px-2">
-                                        <thead>
-                                            <tr>
-                                                <th>Clave</th>
-                                                <th>Fecha</th>
-                                                <th>Proovedor</th>
-                                                <th>Almacen origen</th>
-                                                <th>Almacen destino</th>
-                                                <th>Tipo de movimiento</th>
-                                                <th>Notas</th>
-                                                <th>Empleado</th>
-                                                <th className="text-center">Operacion</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {
-                                                this.state.data.map(movements =>
-                                                    <tr key={movements.movementId}>
-                                                        <th scope="row">{movements.movementId}</th>
-                                                        <td>{movements.date}</td>
-                                                        <td>{movements.supplierId}</td>
-                                                        <td>{movements.originWarehouseId}</td>
-                                                        <td>{movements.targetWarehouseId}</td>
-                                                        <td>{movements.type}</td>
-                                                        <td>{movements.notes}</td>
-                                                        <td>{movements.companyId}</td>
-                                                        <td className="text-center">
-                                                            <button type="button" className="btn btn-primary" onClick={() => this.editar(movements)}>
-                                                                <BsPencilFill />
-                                                            </button>
-                                                            <button type="button" className="btn btn-danger" onClick={() => this.eliminar(movements)}>
-                                                                <BsFillTrashFill />
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            }
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
                         </div>
