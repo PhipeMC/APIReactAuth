@@ -20,10 +20,10 @@ namespace InventoryWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Movement>>> GetMovements()
         {
-          if (_context.Movements == null)
-          {
-              return NotFound();
-          }
+            if (_context.Movements == null)
+            {
+                return NotFound();
+            }
             return await _context.Movements.ToListAsync();
         }
 
@@ -31,10 +31,10 @@ namespace InventoryWebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Movement>> GetMovement(int id)
         {
-          if (_context.Movements == null)
-          {
-              return NotFound();
-          }
+            if (_context.Movements == null)
+            {
+                return NotFound();
+            }
             var movement = await _context.Movements.FindAsync(id);
 
             if (movement == null)
@@ -81,10 +81,10 @@ namespace InventoryWebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Movement>> PostMovement(Movement movement)
         {
-          if (_context.Movements == null)
-          {
-              return Problem("Entity set 'NorthwindContext.Movements'  is null.");
-          }
+            if (_context.Movements == null)
+            {
+                return Problem("Entity set 'NorthwindContext.Movements'  is null.");
+            }
             _context.Movements.Add(movement);
             await _context.SaveChangesAsync();
 

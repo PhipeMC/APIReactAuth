@@ -6,7 +6,7 @@ import {
 } from "reactstrap";
 import {
     BsPlusLg, BsSearch, BsFillDiagram3Fill, BsBasketFill, BsBoxSeam,
-    BsListStars, BsInboxesFill, BsTable, BsPencilFill
+    BsListStars, BsInboxesFill, BsTable, BsPencilFill, BsFillTrashFill
 } from "react-icons/bs";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/transactions.css';
@@ -18,10 +18,27 @@ export class Movement extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            modal: false, data: []
+            //modal: false, 
+            data: [],
+            suppliers: [],
+            companies: [],
+            employees: [],
+            warehouses: [],
+            accion: 0,
+            movementId: 0,
+            dateMov: "",
+            provName: null,//foranea
+            sourceWare: 0,//foranea
+            targetWare: null,//foranea
+            typeMov: "",
+            notesMov: null,
+            empId: "",//foranea
+            compania: 1,
+            movEditable: {}
         };
 
-        this.toggle = this.toggle.bind(this);
+        //this.toggle = this.toggle.bind(this);
+        this.handleClick = this.handleClick.bind(this);
     }
 
     componentDidMount() {
@@ -29,15 +46,214 @@ export class Movement extends Component {
             return response.json();
         }).then((dataApi) => {
             this.setState({ data: dataApi })
+            //console.log(dataApi);
+        }).catch(function (error) {
+            console.log(error);
+        })
+
+        fetch('/api/suppliers').then((response) => {
+            return response.json();
+        }).then((dataApi) => {
+            this.setState({ suppliers: dataApi })
+            //console.log(dataApi);
+        }).catch(function (error) {
+            console.log(error);
+        })
+
+        fetch('/api/companies').then((response) => {
+            return response.json();
+        }).then((dataApi) => {
+            this.setState({ companies: dataApi })
+            //console.log(dataApi);
+        }).catch(function (error) {
+            console.log(error);
+        })
+
+        fetch('/api/employees').then((response) => {
+            return response.json();
+        }).then((dataApi) => {
+            this.setState({ employees: dataApi })
+            // console.log(dataApi);
+        }).catch(function (error) {
+            console.log(error);
+        })
+
+        fetch('/api/warehouses').then((response) => {
+            return response.json();
+        }).then((dataApi) => {
+            this.setState({ warehouses: dataApi })
+            //console.log(dataApi);
         }).catch(function (error) {
             console.log(error);
         })
     }
 
-    toggle() {
+    mitoggle = () => {
         this.setState({
-            modal: !this.state.modal
+            accion: 0,
+            movementId: 0,
+            dateMov: "",
+            provName: null,//foranea
+            sourceWare: 0,//foranea
+            targetWare: null,//foranea
+            typeMov: "",
+            notesMov: null,
+            empId: 0,//foranea
+            compania: 1
         });
+    }
+
+    mostrarInsertar = () => {
+        this.setState({
+            accion: 1
+
+        });
+        console.log(this.state);
+    }
+
+    handleChange = (event) => {
+        //Actualizo el estado segun los valores
+        this.setState({ [event.target.name]: event.target.value });
+        //console.log(this.state);
+    }
+
+    handleClick() {
+
+        if (this.state.accion === 1) {
+
+            var fecha = this.state.dateMov + "T00:00:00.000Z"
+
+            var movimiento = {
+                movementId: 0,
+                date: fecha,
+                supplierId: this.state.provName,
+                originWarehouseId: this.state.sourceWare,
+                targetWarehouseId: this.state.targetWare,
+                type: this.state.typeMov,
+                notes: this.state.notesMov,
+                companyId: 1,
+                employeeId: this.state.empId
+            }
+
+            const options = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(movimiento)
+            };
+
+            fetch('/api/movements', options)
+                .then(
+                    (response) => { return response.status; }
+                ).then(
+                    (code) => {
+                        if (code == 201) {
+                            console.log(code);
+                            const allMoves = Array.from(this.state.data);
+                            allMoves.push(movimiento);
+                            this.componentDidMount();
+                            this.mitoggle();
+                        }
+                    }
+                );
+        }
+        else if (this.state.accion == 2) {
+            var movimiento = {
+                movementId: this.state.movementId,
+                date: this.state.movEditable.date,
+                supplierId: this.state.movEditable.supplierId,
+                originWarehouseId: this.state.movEditable.originWarehouseId,
+                targetWarehouseId: this.state.movEditable.targetWarehouseId,
+                type: this.state.movEditable.type,
+                notes: this.state.movEditable.notes,
+                companyId: 1,
+                employeeId: this.state.movEditable.employeeId
+            }
+
+            const options = {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(movimiento)
+            };
+
+            fetch('/api/movements/' + this.state.movEditable.movementId, options)
+                .then(
+                    (response) => { return response.status; }
+                ).then(
+                    (code) => {
+                        console.log(code);
+                        if (code == 204) {
+                            console.log(code);
+                            const allMoves = Array.from(this.state.data);
+                            allMoves.push(movimiento);
+                            this.componentDidMount();
+                            this.mitoggle();
+                        }
+                    }
+                );
+        }
+        else if (this.state.accion === 3) {
+
+            var movimiento = {
+                movementId: this.state.movementId,
+                date: this.state.movEditable.date,
+                supplierId: this.state.movEditable.supplierId,
+                originWarehouseId: this.state.movEditable.originWarehouseId,
+                targetWarehouseId: this.state.movEditable.targetWarehouseId,
+                type: this.state.movEditable.type,
+                notes: this.state.movEditable.notes,
+                companyId: 1,
+                employeeId: this.state.movEditable.employeeId
+            }
+
+            const options = {
+                method: "DELETE"
+            };
+
+            fetch('/api/movements/' + this.state.movEditable.movementId, options)
+                .then(
+                    (response) => { return response.status; }
+                ).then(
+                    (code) => {
+                        console.log("El código es: " + code);
+                        if (code == 204 || code == 200) {
+                            console.log(code);
+                            const allMoves = Array.from(this.state.data);
+                            allMoves.pop(movimiento);
+                            this.componentDidMount();
+                            this.mitoggle();
+                        }
+                    }
+                );
+        }
+
+    }
+
+    editar = (item) => {
+
+        console.log(item.movementId);
+        console.log(item.supplierId);
+        console.log(item.date);
+
+        fetch('/api/movements/' + item.movementId)
+            .then(response => { return response.json() })
+            .then(o => {
+                console.log("primer fetch "+ o);
+                this.setState({ accion: 2, movEditable: o, movementId: o.movementId })
+            });
+    }
+
+    eliminar = (item) => {
+
+        fetch('/api/movements/' + item.movementId)
+            .then(response => { return response.json() })
+            .then(o => {
+                console.log(o);
+                this.setState({ accion: 3, movEditable: o, movementId: o.movementId })
+            });
     }
 
     render() {
@@ -45,10 +261,6 @@ export class Movement extends Component {
             <div>
                 <div className="d-flex">
                     <div className="sidebar-container sidebar-color d-none d-md-block">
-                        <div className="logo">
-                            <h2 className="m-0 fw-bold" style={{ color: "#FFFFFF" }}><img src={Logo} width="25em"
-                                height="25em" className="pb-1" /> Northwind</h2>
-                        </div>
                         <div className="menu">
                             {/*<a href="/" className="d-block p-3 text-white active"><BsFillDiagram3Fill className="me-2 lead" /> Compañias</a>*/}
                             <a href="/suppliers" className="d-block p-3 text-white"><BsBasketFill className="me-2 lead" /> Proveedores</a>
@@ -65,17 +277,6 @@ export class Movement extends Component {
                                     <Input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" />
                                     <Button className="btn btn-search position-absolute" type="submit"><BsSearch /></Button>
                                 </Form>
-                                {/*<UncontrolledDropdown>
-                                    <DropdownToggle caret nav className="text-muted">
-                                        <img src={Profile} alt="" className="rounded-circle avatar me-2" /> Austin
-                                    </DropdownToggle>
-                                    <DropdownMenu className="text-dark" right>
-                                        <DropdownItem>Mi Perfil</DropdownItem>
-                                        <DropdownItem>Configuración</DropdownItem>
-                                        <DropdownItem divider></DropdownItem>
-                                        <DropdownItem>Cerrar sesión</DropdownItem>
-                                    </DropdownMenu>
-        </UncontrolledDropdown>*/}
                             </div>
                         </Navbar>
                         <div className="content">
@@ -115,70 +316,130 @@ export class Movement extends Component {
                             <div style={{ backgroundcolor: "#0055FF" }}>
                                 <div className="py-3 my-5 bg-light mx-5 px-3">
                                     <div>
-                                        <Button color="primary" onClick={this.toggle}><BsPlusLg /> Agregar </Button>
+                                        <Button color="primary" onClick={this.mostrarInsertar}><BsPlusLg /> Agregar </Button>
                                     </div>
                                     <div>
-                                        <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} centered>
-                                            <ModalHeader toggle={this.toggle} className="text-dark" close={<Button onClick={this.toggle} className="btn-close"></Button>}>Agregar Movimiento</ModalHeader>
+                                        <Modal
+                                            isOpen={this.state.accion > 0 && this.state.accion < 3 && true}
+                                            toggle={this.mitoggle}
+                                            className={this.props.className}
+                                            centered
+                                        >
+                                            <ModalHeader toggle={this.mitoggle} className="text-dark" close={<Button onClick={this.mitoggle} className="btn-close"></Button>}>Agregar Movimiento</ModalHeader>
                                             <ModalBody className="text-dark">
                                                 <Form>
                                                     <FormGroup>
-                                                        <label for="txt-company">ID del movimiento</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
+                                                        <label for="movementId">ID del movimiento</label>
+                                                        <input id="movementId" name="movementId" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.movementId} />
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <label for="txt-company">Fecha del movimiento</label>
-                                                        <input type="date" className="form-control mb-3" placeholder="Juan López Zavala" />
+                                                        <label for="dateMov">Fecha del movimiento*</label>
+                                                        <input id="dateMov" name="dateMov" type="date" className="form-control mb-3" onChange={this.handleChange} value={this.state.dateMov} />
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <label for="txt-address">Proovedor</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="" />
+                                                        <label for="provName">Proovedor</label>
+                                                        <select id="provName" name="provName" class="form-select mb-3" aria-label="Default select example" onChange={this.handleChange} value={this.state.provName}>
+                                                            <option>Selecciona...</option>
+                                                            {
+                                                                this.state.suppliers.map(s =>
+                                                                    <option value={s.supplierId}>{s.companyName}</option>
+                                                                )
+                                                            }
+                                                        </select>
                                                     </FormGroup>
 
                                                     <Row>
+
                                                         <Col md={6}>
                                                             <FormGroup>
-                                                                <label for="txt-city">Almacen de origen</label>
-                                                                <input type="text" className="form-control mb-3" placeholder="" />
+                                                                <label for="sourceWare">Almacen origen*</label>
+                                                                <select id="sourceWare" name="sourceWare" class="form-select mb-3" aria-label="Default select example" onChange={this.handleChange} value={this.state.sourceWare}>
+                                                                    <option>Selecciona...</option>
+                                                                    {
+                                                                        this.state.warehouses.map(w =>
+                                                                            <option value={w.warehouseId}>{w.description}</option>
+                                                                        )
+                                                                    }
+                                                                </select>
                                                             </FormGroup>
                                                         </Col>
 
                                                         <Col md={6}>
                                                             <FormGroup>
-                                                                <label for="txt-city">Almacen de destino</label>
-                                                                <input type="text" className="form-control mb-3" placeholder="" />
+                                                                <label for="targetWare">Almacen destino</label>
+                                                                <select id="targetWare" name="targetWare" class="form-select mb-3" aria-label="Default select example" onChange={this.handleChange} value={this.state.targetWare} >
+                                                                    <option>Selecciona...</option>
+                                                                    {
+                                                                        this.state.warehouses.map(w =>
+                                                                            <option value={w.warehouseId}>{w.description}</option>
+                                                                        )
+                                                                    }
+                                                                </select>
                                                             </FormGroup>
                                                         </Col>
                                                     </Row>
 
                                                     <FormGroup>
-                                                        <label for="exampleInputPassword1">Tipo de movimiento</label>
-                                                        <select class="form-select mb-3" aria-label="Default select example">
-                                                            <option>COMPRA</option>
-                                                            <option>TRASPASO</option>
-                                                            <option>AJUSTE</option>
-                                                            <option>VENTA</option>
+                                                        <label for="typeMov">Tipo de movimiento*</label>
+                                                        <select id="typeMov" name="typeMov" class="form-select mb-3" aria-label="Default select example" onChange={this.handleChange} value={this.state.typeMov} >
+                                                            <option>Selecciona...</option>
+                                                            <option value={'compra'} >COMPRA</option>
+                                                            <option value={'traspaso'}>TRASPASO</option>
+                                                            <option value={'ajuste'}>AJUSTE</option>
+                                                            <option value={'venta'}>VENTA</option>
                                                         </select>
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <label for="txt-phone">Notas</label>
-                                                        <Input type="textarea" className="mb-3" placeholder="" />
+                                                        <label for="notesMov">Notas</label>
+                                                        <Input id="notesMov" name="notesMov" type="textarea" className="mb-3" placeholder="" onChange={this.handleChange} value={this.state.notesMov} />
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <label for="txt-phone">Empleado</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="XXX-XXX-XX-XX" />
+                                                        <label for="empId">Empleado*</label>
+                                                        <select id="empId" name="empId" class="form-select mb-3" aria-label="Default select example" onChange={this.handleChange} value={this.state.empId}>
+                                                            <option>Selecciona...</option>
+                                                            {
+                                                                this.state.employees.map(e =>
+                                                                    <option value={e.employeeId}>{e.firstName + " " + e.lastName}</option>
+                                                                )
+                                                            }
+                                                        </select>
                                                     </FormGroup>
-
                                                 </Form>
                                             </ModalBody>
                                             <ModalFooter>
-                                                <Button color="primary" onClick={this.toggle}>Agregar</Button>
-                                                <Button color="secondary" onClick={this.toggle}>Cancelar</Button>
+                                                <Button color="primary" onClick={this.handleClick}>Agregar</Button>
+                                                <Button color="secondary" onClick={this.mitoggle}>Cancelar</Button>
                                             </ModalFooter>
                                         </Modal>
+
+                                        <Modal
+                                            isOpen={this.state.accion == 3 && true}
+                                            centered
+                                            toggle={this.mitoogle}>
+
+                                            <ModalHeader className="text-dark" toggle={this.mitoogle}>
+                                                Eliminar
+                                            </ModalHeader>
+                                            <ModalBody className="text-dark">
+                                                ¿Desea eliminar el elemento?
+                                            </ModalBody>
+                                            <ModalFooter>
+                                                <Button
+                                                    color="danger"
+                                                    onClick={this.handleClick}
+                                                >
+                                                    Eliminar
+                                                </Button>
+                                                {' '}
+                                                <Button onClick={this.mitoggle}>
+                                                    Cancelar
+                                                </Button>
+                                            </ModalFooter>
+                                        </Modal>
+
                                     </div>
                                     <table id="example" className="table dt-responsive nowrap align-middle px-2">
                                         <thead>
@@ -196,7 +457,7 @@ export class Movement extends Component {
                                         </thead>
                                         <tbody>
                                             {
-                                                this.state.data.map(movements => 
+                                                this.state.data.map(movements =>
                                                     <tr key={movements.movementId}>
                                                         <th scope="row">{movements.movementId}</th>
                                                         <td>{movements.date}</td>
@@ -206,8 +467,14 @@ export class Movement extends Component {
                                                         <td>{movements.type}</td>
                                                         <td>{movements.notes}</td>
                                                         <td>{movements.companyId}</td>
-                                                        <td className="text-center"><button type="button" className="btn btn-primary">
-                                                            <BsPencilFill /></button></td>
+                                                        <td className="text-center">
+                                                            <button type="button" className="btn btn-primary" onClick={() => this.editar(movements)}>
+                                                                <BsPencilFill />
+                                                            </button>
+                                                            <button type="button" className="btn btn-danger" onClick={() => this.eliminar(movements)}>
+                                                                <BsFillTrashFill />
+                                                            </button>
+                                                        </td>
                                                     </tr>
                                                 )
                                             }
