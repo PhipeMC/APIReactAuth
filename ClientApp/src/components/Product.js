@@ -45,10 +45,6 @@ export class Product extends Component {
             <div>
                 <div className="d-flex">
                     <div className="sidebar-container sidebar-color d-none d-md-block">
-                        <div className="logo">
-                            <h2 className="m-0 fw-bold" style={{ color: "#FFFFFF" }}><img src={Logo} width="25em"
-                                height="25em" className="pb-1" /> Northwind</h2>
-                        </div>
                         <div className="menu">
                             {/*<a href="/" className="d-block p-3 text-white active"><BsFillDiagram3Fill className="me-2 lead" /> Compañias</a>*/}
                             <a href="/suppliers" className="d-block p-3 text-white"><BsBasketFill className="me-2 lead" /> Proveedores</a>
