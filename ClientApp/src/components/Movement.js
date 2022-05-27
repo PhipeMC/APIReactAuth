@@ -116,7 +116,6 @@ export class Movement extends Component {
             accion: 1
 
         });
-        console.log(this.state);
     }
 
     handleChange = (event) => {
@@ -180,17 +179,7 @@ export class Movement extends Component {
                 companyId: this.state.compania,
                 employeeId: this.state.empId
             }
-            /*
-            console.log(movimiento.movementId);
-            console.log(movimiento.date);
-            console.log(movimiento.supplierId);
-            console.log(movimiento.originWarehouseId);
-            console.log(movimiento.targetWarehouseId);
-            console.log(movimiento.type);
-            console.log(movimiento.notes);
-            console.log(movimiento.companyId);
-            console.log(movimiento.empId);
-*/
+
             const options = {
                 method: "PUT",
                 headers: {
@@ -253,10 +242,6 @@ export class Movement extends Component {
     }
 
     editar = (item) => {
-
-        console.log(item.movementId);
-        console.log(item.supplierId);
-        console.log(item.date);
 
         fetch('/api/movements/' + item.movementId)
             .then(response => { return response.json() })
