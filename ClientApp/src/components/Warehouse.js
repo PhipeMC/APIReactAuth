@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, useEffect, useState } from "react";
 import {
     Button, Form, Navbar, Input, Card, CardBody, CardTitle, CardSubtitle,
     CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Table, Col, Row
@@ -19,33 +19,21 @@ export class Warehouse extends Component {
         super(props);
 
         this.state = {
-<<<<<<< HEAD
-            modal: false, modal2: false, data: [], accion: 0, id: 0,
-            description: "", address: "", isUserValid: false, isGerente: false
-=======
             data: [],
             accion: 0,
             id: 0,
             description: "",
             address: "",
             company: 1,
-            warehouseE: {}
->>>>>>> 6773b2bc9ab275c2c57980add3314b9ba382686a
+            warehouseE: {},
+            isUserValid: false,
+            isGerente: false
         };
 
         this.handleClick = this.handleClick.bind(this);
     }
 
     componentDidMount() {
-        fetch('/api/warehouses').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ data: dataApi })
-            console.log(dataApi);
-        }).catch(function (error) {
-            console.log(error);
-        })
-
         authService.getUser().then(
             (u) => {
                 const valo = authService.isValidUser(u);
@@ -54,6 +42,27 @@ export class Warehouse extends Component {
                 this.setState({ isUserValid: valo });
             }
         );
+
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    method: "GET",
+                    headers: {
+                        headers: !token ? {} : {
+                            'Authorization': `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    }
+                };
+                fetch('/api/warehouses').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ data: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        )
     }
 
     handleClick() {
@@ -76,7 +85,7 @@ export class Warehouse extends Component {
                 break;
 
             case 3:
-                warehouse.companyId= this.state.company;
+                warehouse.companyId = this.state.company;
                 this.delete(warehouse);
                 break;
         }
@@ -219,7 +228,6 @@ export class Warehouse extends Component {
                 <div className="d-flex">
                     <div className="sidebar-container sidebar-color d-none d-md-block">
                         <div className="menu">
-                            {/*<a href="/" className="d-block p-3 text-white active"><BsFillDiagram3Fill className="me-2 lead" /> Compañias</a>*/}
                             <a href="/suppliers" className="d-block p-3 text-white"><BsBasketFill className="me-2 lead" /> Proveedores</a>
                             <a href="/warehouses" className="d-block p-3 text-white selected"><BsInboxesFill className="me-2 lead" /> Almacenes</a>
                             <a href="/movements" className="d-block p-3 text-white"><BsTable className="me-2 lead" /> Movimientos</a>
@@ -272,32 +280,12 @@ export class Warehouse extends Component {
                             </section>
                             <div style={{ backgroundcolor: "#0055FF" }}>
                                 <div className="py-3 my-5 bg-light mx-5 px-3">
-<<<<<<< HEAD
                                     {
                                         this.state.isUserValid &&
                                         <div>
                                             <Button color="primary" onClick={() => this.mostrarModalAgregar()}><BsPlusLg /> Agregar </Button>
                                         </div>
                                     }
-                                    <div>
-                                        <Modal isOpen={this.state.accion == 1} toggle={this.mitoggle} className={this.props.className} centered>
-                                            <ModalHeader toggle={this.mitoogle} className="text-dark" close={<Button onClick={this.mitoogle} className="btn-close"></Button>}>Agregar Almacen</ModalHeader>
-                                            <ModalBody className="text-dark">
-                                                <Form>
-                                                    <FormGroup>
-                                                        <label for="txt-company">ID del almacen</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <label for="txt-company">Descripción del almacen</label>
-                                                        <input type="text" name="description" className="form-control mb-3" onChange={this.handleChange} value={this.state.description} placeholder="Empresa-X" />
-                                                    </FormGroup>
-=======
-                                    <div>
-                                        <Button color="primary" onClick={() => this.mostrarModalAgregar()}><BsPlusLg /> Agregar </Button>
-                                    </div>
->>>>>>> 6773b2bc9ab275c2c57980add3314b9ba382686a
-
                                     <Table className="dt-responsive nowrap align-middle px-2">
                                         <thead>
                                             <tr>
@@ -317,45 +305,20 @@ export class Warehouse extends Component {
                                                         <th scope="row">{warehouses.warehouseId}</th>
                                                         <td>{warehouses.description}</td>
                                                         <td>{warehouses.address}</td>
-<<<<<<< HEAD
                                                         {
                                                             this.state.isUserValid &&
-                                                            <td td className="text-center"><Button type="button" onClick={this.toggle2} className="btn btn-primary">
-                                                                <BsPencilFill /></Button>
-                                                                <Modal isOpen={this.state.modal2} toggle={this.toggle2} className={this.props.className} centered>
-                                                                    <ModalHeader toggle={this.toggle2} className="text-dark" close={<Button onClick={this.toggle2} className="btn-close"></Button>}>Editar Almacen</ModalHeader>
-                                                                    <ModalBody className="text-dark">
-                                                                        <Form>
-                                                                            <FormGroup>
-                                                                                <label for="txt-company">ID del almacen</label>
-                                                                                <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
-                                                                            </FormGroup>
-                                                                            <FormGroup>
-                                                                                <label for="txt-company">Descripción del almacen</label>
-                                                                                <input type="text" name="description" className="form-control mb-3" placeholder="Empresa-X" />
-                                                                            </FormGroup>
-
-                                                                            <FormGroup>
-                                                                                <label for="txt-company">Dirección del almacen</label>
-                                                                                <input type="text" name="address" className="form-control mb-3" placeholder="Juan López Zavala" />
-                                                                            </FormGroup>
-                                                                        </Form>
-                                                                    </ModalBody>
-                                                                    <ModalFooter>
-                                                                        <Button color="primary" onClick={this.toggle2}>Editar</Button>
-                                                                        <Button color="secondary" onClick={this.toggle2}>Cancelar</Button>
-                                                                    </ModalFooter>
-                                                                </Modal>
+                                                            <td className="text-center">
+                                                                <div className="d-flex flex-row justify-content-center">
+                                                                    <Button type="button" onClick={() => this.editar(warehouses)} className="btn btn-primary">
+                                                                        <BsPencilFill /></Button>
+                                                                    {
+                                                                        !this.state.isGerente &&
+                                                                        <Button type="button" onClick={() => this.eliminar(warehouses)} className="btn btn-danger">
+                                                                            <BsFillTrashFill /></Button>
+                                                                    }
+                                                                </div>
                                                             </td>
                                                         }
-=======
-                                                        <td className="text-center"><Button type="button" onClick={() => this.editar(warehouses)} className="btn btn-primary">
-                                                            <BsPencilFill /></Button>
-                                                        </td>
-                                                        <td className="text-center"><Button type="button" onClick={() => this.eliminar(warehouses)} className="btn btn-danger">
-                                                            <BsFillTrashFill /></Button>
-                                                        </td>
->>>>>>> 6773b2bc9ab275c2c57980add3314b9ba382686a
                                                     </tr>
                                                 )
                                             }
@@ -380,7 +343,6 @@ export class Warehouse extends Component {
                                                     <label for="description">Descripción del almacen</label>
                                                     <input type="description" name="description" className="form-control mb-3" onChange={this.handleChange} value={this.state.description} placeholder="Empresa-X" />
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <label for="address">Dirección del almacen</label>
                                                     <input type="address" name="address" className="form-control mb-3" onChange={this.handleChange} value={this.state.address} placeholder="Juan López Zavala" />
@@ -398,7 +360,6 @@ export class Warehouse extends Component {
                                         centered
                                         className={this.props.className}
                                         toggle={this.mitoggle}>
-
                                         <ModalHeader className="text-dark" close={<Button onClick={this.mitoggle} className="btn-close"></Button>}>
                                             Eliminar
                                         </ModalHeader>
@@ -418,7 +379,6 @@ export class Warehouse extends Component {
                                                     </FormGroup>
                                                 </Col>
                                             </Row>
-
                                         </ModalBody>
                                         <ModalFooter>
                                             <Button
@@ -438,7 +398,7 @@ export class Warehouse extends Component {
                         </div>
                     </div>
                 </div>
-            </div >
+            </div>
         );
     }
 }
