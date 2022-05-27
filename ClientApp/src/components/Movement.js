@@ -1,17 +1,15 @@
 import { Component } from "react";
 import {
-    Button, Form, Navbar, Input, UncontrolledDropdown, DropdownToggle,
-    DropdownMenu, DropdownItem, Card, CardBody, CardTitle, CardSubtitle,
+    Button, Form, Navbar, Input, Card, CardBody, CardTitle, CardSubtitle,
     CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Row, Col
 } from "reactstrap";
 import {
-    BsPlusLg, BsSearch, BsFillDiagram3Fill, BsBasketFill, BsBoxSeam,
+    BsPlusLg, BsSearch, BsBasketFill, BsBoxSeam,
     BsListStars, BsInboxesFill, BsTable, BsPencilFill, BsFillTrashFill
 } from "react-icons/bs";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/transactions.css';
-import Logo from '../Images/northwindLogoUnico.png';
-import Profile from '../Images/stone-cold-steve-austin-wwe.jpg';
+import authService from './api-authorization/AuthorizeService';
 
 export class Movement extends Component {
 
@@ -34,7 +32,9 @@ export class Movement extends Component {
             notesMov: null,
             empId: "",//foranea
             compania: 1,
-            movEditable: {}
+            movEditable: {},
+            isUserValid: false,
+            isGerente: false
         };
 
         this.handleClick = this.handleClick.bind(this);
@@ -85,6 +85,15 @@ export class Movement extends Component {
         }).catch(function (error) {
             console.log(error);
         })
+
+        authService.getUser().then(
+            (u) => {
+                const valo = authService.isValidUser(u);
+                const role = authService.isGerente(u);
+                this.setState({ isGerente: role });
+                this.setState({ isUserValid: valo });
+            }
+        );
     }
 
     mitoggle = () => {
@@ -323,9 +332,13 @@ export class Movement extends Component {
                             </section>
                             <div style={{ backgroundcolor: "#0055FF" }}>
                                 <div className="py-3 my-5 bg-light mx-5 px-3">
-                                    <div>
-                                        <Button color="primary" onClick={this.mostrarInsertar}><BsPlusLg /> Agregar </Button>
-                                    </div>
+                                    {
+                                        this.state.isUserValid &&
+                                        <div>
+                                            <Button color="primary" onClick={this.mostrarInsertar}><BsPlusLg /> Agregar </Button>
+                                        </div>
+                                    }
+
                                     <table id="example" className="table dt-responsive nowrap align-middle px-2">
                                         <thead>
                                             <tr>
@@ -356,9 +369,12 @@ export class Movement extends Component {
                                                             <button type="button" className="btn btn-primary" onClick={() => this.editar(movements)}>
                                                                 <BsPencilFill />
                                                             </button>
-                                                            <button type="button" className="btn btn-danger" onClick={() => this.eliminar(movements)}>
-                                                                <BsFillTrashFill />
-                                                            </button>
+                                                            {
+                                                                !this.state.isGerente &&
+                                                                <button type="button" className="btn btn-danger" onClick={() => this.eliminar(movements)}>
+                                                                    <BsFillTrashFill />
+                                                                </button>
+                                                            }
                                                         </td>
                                                     </tr>
                                                 )
