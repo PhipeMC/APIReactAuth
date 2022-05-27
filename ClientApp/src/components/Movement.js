@@ -16,7 +16,6 @@ export class Movement extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            //modal: false, 
             data: [],
             suppliers: [],
             companies: [],
@@ -41,51 +40,6 @@ export class Movement extends Component {
     }
 
     componentDidMount() {
-        fetch('/api/movements').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ data: dataApi })
-            //console.log(dataApi);
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/suppliers').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ suppliers: dataApi })
-            //console.log(dataApi);
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/companies').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ companies: dataApi })
-            //console.log(dataApi);
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/employees').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ employees: dataApi })
-            // console.log(dataApi);
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/warehouses').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ warehouses: dataApi })
-            //console.log(dataApi);
-        }).catch(function (error) {
-            console.log(error);
-        })
-
         authService.getUser().then(
             (u) => {
                 const valo = authService.isValidUser(u);
@@ -94,6 +48,59 @@ export class Movement extends Component {
                 this.setState({ isUserValid: valo });
             }
         );
+
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    method: "GET",
+                    headers: {
+                        headers: !token ? {} : {
+                            'Authorization': `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    }
+                };
+                fetch('/api/movements').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ data: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        )
+
+        fetch('/api/suppliers').then((response) => {
+            return response.json();
+        }).then((dataApi) => {
+            this.setState({ suppliers: dataApi })
+        }).catch(function (error) {
+            console.log(error);
+        })
+
+        fetch('/api/companies').then((response) => {
+            return response.json();
+        }).then((dataApi) => {
+            this.setState({ companies: dataApi })
+        }).catch(function (error) {
+            console.log(error);
+        })
+
+        fetch('/api/employees').then((response) => {
+            return response.json();
+        }).then((dataApi) => {
+            this.setState({ employees: dataApi })
+        }).catch(function (error) {
+            console.log(error);
+        })
+
+        fetch('/api/warehouses').then((response) => {
+            return response.json();
+        }).then((dataApi) => {
+            this.setState({ warehouses: dataApi })
+        }).catch(function (error) {
+            console.log(error);
+        })
     }
 
     mitoggle = () => {
@@ -122,7 +129,6 @@ export class Movement extends Component {
     handleChange = (event) => {
         //Actualizo el estado segun los valores
         this.setState({ [event.target.name]: event.target.value });
-        //console.log(this.state);
     }
 
     handleClick() {
@@ -180,17 +186,7 @@ export class Movement extends Component {
                 companyId: this.state.compania,
                 employeeId: this.state.empId
             }
-            /*
-            console.log(movimiento.movementId);
-            console.log(movimiento.date);
-            console.log(movimiento.supplierId);
-            console.log(movimiento.originWarehouseId);
-            console.log(movimiento.targetWarehouseId);
-            console.log(movimiento.type);
-            console.log(movimiento.notes);
-            console.log(movimiento.companyId);
-            console.log(movimiento.empId);
-*/
+
             const options = {
                 method: "PUT",
                 headers: {
@@ -316,7 +312,7 @@ export class Movement extends Component {
                                 <div className="container">
                                     <div className="row">
                                         <div className="col-lg-9">
-                                            <h1 className="fw-bold mb-0 text-dark">Bienvenido Austin</h1>
+                                            <h1 className="fw-bold mb-0 text-dark">Bienvenido</h1>
                                             <p className="lead text-muted">Revisa la ultima información de movimientos</p>
                                         </div>
                                     </div>
@@ -365,7 +361,10 @@ export class Movement extends Component {
                                                 <th>Tipo de movimiento</th>
                                                 <th>Notas</th>
                                                 <th>Empleado</th>
-                                                <th className="text-center">Operacion</th>
+                                                {
+                                                    this.state.isUserValid &&
+                                                    <th className="text-center">Operacion</th>
+                                                }
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -380,17 +379,22 @@ export class Movement extends Component {
                                                         <td>{movements.type}</td>
                                                         <td>{movements.notes}</td>
                                                         <td>{movements.companyId}</td>
-                                                        <td className="text-center">
-                                                            <button type="button" className="btn btn-primary" onClick={() => this.editar(movements)}>
-                                                                <BsPencilFill />
-                                                            </button>
-                                                            {
-                                                                !this.state.isGerente &&
-                                                                <button type="button" className="btn btn-danger" onClick={() => this.eliminar(movements)}>
-                                                                    <BsFillTrashFill />
-                                                                </button>
-                                                            }
-                                                        </td>
+                                                        {
+                                                            this.state.isUserValid &&
+                                                            <td className="text-center">
+                                                                <div className="d-flex flex-row">
+                                                                    <button type="button" className="btn btn-primary" onClick={() => this.editar(movements)}>
+                                                                        <BsPencilFill />
+                                                                    </button>
+                                                                    {
+                                                                        !this.state.isGerente &&
+                                                                        <button type="button" className="btn btn-danger" onClick={() => this.eliminar(movements)}>
+                                                                            <BsFillTrashFill />
+                                                                        </button>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        }
                                                     </tr>
                                                 )
                                             }

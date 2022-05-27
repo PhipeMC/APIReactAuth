@@ -1,4 +1,4 @@
-import { Component, useEffect, useState } from "react";
+import { Component } from "react";
 import {
     Button, Form, Navbar, Input, Card, CardBody, CardTitle, CardSubtitle,
     CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Table
@@ -10,6 +10,7 @@ import {
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/transactions.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import authService from './api-authorization/AuthorizeService';
 
 
 export class Warehouse extends Component {
@@ -18,7 +19,7 @@ export class Warehouse extends Component {
         super(props);
         this.state = {
             modal: false, modal2: false, data: [], accion: 0, id: 0,
-            description: "", address: ""
+            description: "", address: "", isUserValid: false, isGerente: false
         };
         this.handleClick = this.handleClick.bind(this);
     }
@@ -31,6 +32,15 @@ export class Warehouse extends Component {
         }).catch(function (error) {
             console.log(error);
         })
+
+        authService.getUser().then(
+            (u) => {
+                const valo = authService.isValidUser(u);
+                const role = authService.isGerente(u);
+                this.setState({ isGerente: role });
+                this.setState({ isUserValid: valo });
+            }
+        );
     }
 
     create = (warehouse) => {
@@ -139,7 +149,7 @@ export class Warehouse extends Component {
                                 <div className="container">
                                     <div className="row">
                                         <div className="col-lg-9">
-                                            <h1 className="fw-bold mb-0 text-dark">Bienvenido Austin</h1>
+                                            <h1 className="fw-bold mb-0 text-dark">Bienvenido</h1>
                                             <p className="lead text-muted">Revisa la ultima información de movimientos</p>
                                         </div>
                                     </div>
@@ -170,9 +180,12 @@ export class Warehouse extends Component {
                             </section>
                             <div style={{ backgroundcolor: "#0055FF" }}>
                                 <div className="py-3 my-5 bg-light mx-5 px-3">
-                                    <div>
-                                        <Button color="primary" onClick={() => this.mostrarModalAgregar()}><BsPlusLg /> Agregar </Button>
-                                    </div>
+                                    {
+                                        this.state.isUserValid &&
+                                        <div>
+                                            <Button color="primary" onClick={() => this.mostrarModalAgregar()}><BsPlusLg /> Agregar </Button>
+                                        </div>
+                                    }
                                     <div>
                                         <Modal isOpen={this.state.accion == 1} toggle={this.mitoggle} className={this.props.className} centered>
                                             <ModalHeader toggle={this.mitoogle} className="text-dark" close={<Button onClick={this.mitoogle} className="btn-close"></Button>}>Agregar Almacen</ModalHeader>
@@ -205,7 +218,10 @@ export class Warehouse extends Component {
                                                 <th>Clave</th>
                                                 <th>Descripción</th>
                                                 <th>Dirección</th>
-                                                <th className="text-center">Operacion</th>
+                                                {
+                                                    this.state.isUserValid &&
+                                                    <th className="text-center">Operacion</th>
+                                                }
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -215,33 +231,36 @@ export class Warehouse extends Component {
                                                         <th scope="row">{warehouses.warehouseId}</th>
                                                         <td>{warehouses.description}</td>
                                                         <td>{warehouses.address}</td>
-                                                        <td className="text-center"><Button type="button" onClick={this.toggle2} className="btn btn-primary">
-                                                            <BsPencilFill /></Button>
-                                                            <Modal isOpen={this.state.modal2} toggle={this.toggle2} className={this.props.className} centered>
-                                                                <ModalHeader toggle={this.toggle2} className="text-dark" close={<Button onClick={this.toggle2} className="btn-close"></Button>}>Editar Almacen</ModalHeader>
-                                                                <ModalBody className="text-dark">
-                                                                    <Form>
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">ID del almacen</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
-                                                                        </FormGroup>
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">Descripción del almacen</label>
-                                                                            <input type="text" name="description" className="form-control mb-3" placeholder="Empresa-X" />
-                                                                        </FormGroup>
+                                                        {
+                                                            this.state.isUserValid &&
+                                                            <td td className="text-center"><Button type="button" onClick={this.toggle2} className="btn btn-primary">
+                                                                <BsPencilFill /></Button>
+                                                                <Modal isOpen={this.state.modal2} toggle={this.toggle2} className={this.props.className} centered>
+                                                                    <ModalHeader toggle={this.toggle2} className="text-dark" close={<Button onClick={this.toggle2} className="btn-close"></Button>}>Editar Almacen</ModalHeader>
+                                                                    <ModalBody className="text-dark">
+                                                                        <Form>
+                                                                            <FormGroup>
+                                                                                <label for="txt-company">ID del almacen</label>
+                                                                                <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
+                                                                            </FormGroup>
+                                                                            <FormGroup>
+                                                                                <label for="txt-company">Descripción del almacen</label>
+                                                                                <input type="text" name="description" className="form-control mb-3" placeholder="Empresa-X" />
+                                                                            </FormGroup>
 
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">Dirección del almacen</label>
-                                                                            <input type="text" name="address" className="form-control mb-3" placeholder="Juan López Zavala" />
-                                                                        </FormGroup>
-                                                                    </Form>
-                                                                </ModalBody>
-                                                                <ModalFooter>
-                                                                    <Button color="primary" onClick={this.toggle2}>Editar</Button>
-                                                                    <Button color="secondary" onClick={this.toggle2}>Cancelar</Button>
-                                                                </ModalFooter>
-                                                            </Modal>
-                                                        </td>
+                                                                            <FormGroup>
+                                                                                <label for="txt-company">Dirección del almacen</label>
+                                                                                <input type="text" name="address" className="form-control mb-3" placeholder="Juan López Zavala" />
+                                                                            </FormGroup>
+                                                                        </Form>
+                                                                    </ModalBody>
+                                                                    <ModalFooter>
+                                                                        <Button color="primary" onClick={this.toggle2}>Editar</Button>
+                                                                        <Button color="secondary" onClick={this.toggle2}>Cancelar</Button>
+                                                                    </ModalFooter>
+                                                                </Modal>
+                                                            </td>
+                                                        }
                                                     </tr>
                                                 )
                                             }
@@ -252,7 +271,7 @@ export class Warehouse extends Component {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 }

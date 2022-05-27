@@ -174,7 +174,10 @@ export class Transaction extends Component {
                                                 <th>C.P.</th>
                                                 <th>Pais</th>
                                                 <th>Telefono</th>
-                                                <th className="text-center">Operacion</th>
+                                                {
+                                                    this.state.isUserValid &&
+                                                    <th className="text-center">Operacion</th>
+                                                }
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -190,58 +193,60 @@ export class Transaction extends Component {
                                                         <td>{suppliers.postalCode}</td>
                                                         <td>{suppliers.country}</td>
                                                         <td>{suppliers.phone}</td>
-                                                        <td className="text-center"><Button type="button" onClick={this.toggle} className="btn btn-primary">
-                                                            <BsPencilFill /></Button>
-                                                            <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} centered>
-                                                                <ModalHeader toggle={this.toggle} className="text-dark" close={<Button onClick={this.toggle} className="btn-close"></Button>}>Agregar Proveedor</ModalHeader>
-                                                                <ModalBody className="text-dark">
-                                                                    <Form>
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">ID de la compañia</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
-                                                                        </FormGroup>
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">Nombre de la compañia</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="Empresa-X" />
-                                                                        </FormGroup>
+                                                        {this.state.isUserValid &&
+                                                            <td className="text-center"><Button type="button" onClick={this.toggle} className="btn btn-primary">
+                                                                <BsPencilFill /></Button>
+                                                                <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} centered>
+                                                                    <ModalHeader toggle={this.toggle} className="text-dark" close={<Button onClick={this.toggle} className="btn-close"></Button>}>Agregar Proveedor</ModalHeader>
+                                                                    <ModalBody className="text-dark">
+                                                                        <Form>
+                                                                            <FormGroup>
+                                                                                <label for="txt-company">ID de la compañia</label>
+                                                                                <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
+                                                                            </FormGroup>
+                                                                            <FormGroup>
+                                                                                <label for="txt-company">Nombre de la compañia</label>
+                                                                                <input type="text" className="form-control mb-3" placeholder="Empresa-X" />
+                                                                            </FormGroup>
 
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">Nombre del proovedor</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="Juan López Zavala" />
-                                                                        </FormGroup>
+                                                                            <FormGroup>
+                                                                                <label for="txt-company">Nombre del proovedor</label>
+                                                                                <input type="text" className="form-control mb-3" placeholder="Juan López Zavala" />
+                                                                            </FormGroup>
 
-                                                                        <FormGroup>
-                                                                            <label for="txt-address">Direccion del proovedor</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="Prolongacion Emiliano Zapata 654" />
-                                                                        </FormGroup>
+                                                                            <FormGroup>
+                                                                                <label for="txt-address">Direccion del proovedor</label>
+                                                                                <input type="text" className="form-control mb-3" placeholder="Prolongacion Emiliano Zapata 654" />
+                                                                            </FormGroup>
 
-                                                                        <FormGroup>
-                                                                            <label for="txt-city">Ciudad</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="Morelia" />
-                                                                        </FormGroup>
+                                                                            <FormGroup>
+                                                                                <label for="txt-city">Ciudad</label>
+                                                                                <input type="text" className="form-control mb-3" placeholder="Morelia" />
+                                                                            </FormGroup>
 
-                                                                        <FormGroup>
-                                                                            <label for="txt-cp">Codigo postal</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="384571" />
-                                                                        </FormGroup>
+                                                                            <FormGroup>
+                                                                                <label for="txt-cp">Codigo postal</label>
+                                                                                <input type="text" className="form-control mb-3" placeholder="384571" />
+                                                                            </FormGroup>
 
-                                                                        <FormGroup>
-                                                                            <label for="txt-country">Pais</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="México" />
-                                                                        </FormGroup>
+                                                                            <FormGroup>
+                                                                                <label for="txt-country">Pais</label>
+                                                                                <input type="text" className="form-control mb-3" placeholder="México" />
+                                                                            </FormGroup>
 
-                                                                        <FormGroup>
-                                                                            <label for="txt-phone">Telefono de contacto</label>
-                                                                            <input type="tel" className="form-control mb-3" placeholder="XXX-XXX-XX-XX" />
-                                                                        </FormGroup>
-                                                                    </Form>
-                                                                </ModalBody>
-                                                                <ModalFooter>
-                                                                    <Button color="primary" onClick={this.toggle}>Agregar</Button>
-                                                                    <Button color="secondary" onClick={this.toggle}>Cancelar</Button>
-                                                                </ModalFooter>
-                                                            </Modal>
-                                                        </td>
+                                                                            <FormGroup>
+                                                                                <label for="txt-phone">Telefono de contacto</label>
+                                                                                <input type="tel" className="form-control mb-3" placeholder="XXX-XXX-XX-XX" />
+                                                                            </FormGroup>
+                                                                        </Form>
+                                                                    </ModalBody>
+                                                                    <ModalFooter>
+                                                                        <Button color="primary" onClick={this.toggle}>Agregar</Button>
+                                                                        <Button color="secondary" onClick={this.toggle}>Cancelar</Button>
+                                                                    </ModalFooter>
+                                                                </Modal>
+                                                            </td>
+                                                        }
                                                     </tr>
                                                 )
                                             }

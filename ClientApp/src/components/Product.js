@@ -1,24 +1,23 @@
 import { Component } from "react";
 import {
-    Button, Form, Navbar, Input, UncontrolledDropdown, DropdownToggle,
-    DropdownMenu, DropdownItem, Card, CardBody, CardTitle, CardSubtitle,
-    CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Col, Row, InputGroupText, InputGroup, Table
+    Button, Form, Navbar, Input, Card, CardBody, CardTitle, CardSubtitle,
+    CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Col, Row, InputGroupText, InputGroup,
 } from "reactstrap";
 import {
-    BsPlusLg, BsSearch, BsFillDiagram3Fill, BsBasketFill, BsBoxSeam,
-    BsListStars, BsInboxesFill, BsTable, BsPencilFill
+    BsPlusLg, BsSearch, BsBasketFill, BsBoxSeam,
+    BsListStars, BsInboxesFill, BsTable, BsPencilFill, 
 } from "react-icons/bs";
+import { MdImageNotSupported } from "react-icons/md";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/transactions.css';
-import Logo from '../Images/northwindLogoUnico.png';
-import Profile from '../Images/stone-cold-steve-austin-wwe.jpg';
+import authService from './api-authorization/AuthorizeService';
 
 export class Product extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            modal: false, data: []
+            modal: false, data: [], isUserValid: false, isGerente: false
         };
 
         this.toggle = this.toggle.bind(this);
@@ -32,6 +31,15 @@ export class Product extends Component {
         }).catch(function (error) {
             console.log(error);
         })
+
+        authService.getUser().then(
+            (u) => {
+                const valo = authService.isValidUser(u);
+                const role = authService.isGerente(u);
+                this.setState({ isGerente: role });
+                this.setState({ isUserValid: valo });
+            }
+        );
     }
 
     toggle() {
@@ -61,17 +69,6 @@ export class Product extends Component {
                                     <Input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" />
                                     <Button className="btn btn-search position-absolute" type="submit"><BsSearch /></Button>
                                 </Form>
-                                {/*<UncontrolledDropdown>
-                                    <DropdownToggle caret nav className="text-muted">
-                                        <img src={Profile} alt="" className="rounded-circle avatar me-2" /> Austin
-                                    </DropdownToggle>
-                                    <DropdownMenu className="text-dark" right>
-                                        <DropdownItem>Mi Perfil</DropdownItem>
-                                        <DropdownItem>Configuración</DropdownItem>
-                                        <DropdownItem divider></DropdownItem>
-                                        <DropdownItem>Cerrar sesión</DropdownItem>
-                                    </DropdownMenu>
-        </UncontrolledDropdown>*/}
                             </div>
                         </Navbar>
                         <div className="content">
@@ -79,7 +76,7 @@ export class Product extends Component {
                                 <div className="container">
                                     <div className="row">
                                         <div className="col-lg-9">
-                                            <h1 className="fw-bold mb-0 text-dark">Bienvenido Austin</h1>
+                                            <h1 className="fw-bold mb-0 text-dark">Bienvenido</h1>
                                             <p className="lead text-muted">Revisa la ultima información de movimientos</p>
                                         </div>
                                     </div>
@@ -110,9 +107,13 @@ export class Product extends Component {
                             </section>
                             <div style={{ backgroundcolor: "#0055FF" }}>
                                 <div className="py-3 my-5 bg-light mx-5 px-3">
-                                    <div>
-                                        <Button color="primary" onClick={this.toggle}><BsPlusLg /> Agregar </Button>
-                                    </div>
+                                    {
+                                        this.state.isUserValid &&
+                                        <div>
+                                            <Button color="primary" onClick={this.toggle}><BsPlusLg /> Agregar </Button>
+                                        </div>
+                                    }
+
                                     <div>
                                         <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} centered>
                                             <ModalHeader toggle={this.toggle} className="text-dark" close={<Button onClick={this.toggle} className="btn-close"></Button>}>Agregar Producto</ModalHeader>
@@ -149,10 +150,10 @@ export class Product extends Component {
                                                         </Col>
                                                         <Col md={6}>
                                                             <FormGroup>
-                                                            <label for="txt-country">Precio neto</label>
+                                                                <label for="txt-country">Precio neto</label>
                                                                 <InputGroup>
                                                                     <InputGroupText>$</InputGroupText>
-                                                                    <Input type="text"/>
+                                                                    <Input type="text" />
                                                                 </InputGroup>
                                                             </FormGroup>
                                                         </Col>
@@ -178,13 +179,16 @@ export class Product extends Component {
                                                 <th>Categoria</th>
                                                 <th>Cantidad por unidad</th>
                                                 <th>Precio</th>
-                                                <th>Imagen</th>
-                                                <th className="text-center">Operacion</th>
+                                                <th className="text-center">Imagen</th>
+                                                {
+                                                    this.state.isUserValid &&
+                                                    <th className="text-center">Operacion</th>
+                                                }
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {
-                                                this.state.data.map(products => 
+                                                this.state.data.map(products =>
                                                     <tr key={products.productId}>
                                                         <th scope="row">{products.productId}</th>
                                                         <td>{products.productName}</td>
@@ -192,9 +196,12 @@ export class Product extends Component {
                                                         <td>{products.categoryId}</td>
                                                         <td>{products.quantityPerUnit}</td>
                                                         <td>{products.unitPrice}</td>
-                                                        <td>{products.photoPath}</td>
-                                                        <td className="text-center"><button type="button" className="btn btn-primary">
-                                                            <BsPencilFill /></button></td>
+                                                        <td><div className="text-center"><MdImageNotSupported /></div></td>
+                                                        {
+                                                            this.state.isUserValid &&
+                                                            <td className="text-center"><button type="button" className="btn btn-primary">
+                                                                <BsPencilFill /></button></td>
+                                                        }
                                                     </tr>
                                                 )
                                             }
