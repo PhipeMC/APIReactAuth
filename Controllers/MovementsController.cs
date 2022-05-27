@@ -24,7 +24,7 @@ namespace InventoryWebApi.Controllers
             {
                 return NotFound();
             }
-            return await _context.Movements.ToListAsync();
+            return await _context.Movements.Take(100).ToListAsync();
         }
 
         // GET: api/Movements/5

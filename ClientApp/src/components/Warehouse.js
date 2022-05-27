@@ -2,11 +2,11 @@ import { Component, useEffect, useState } from "react";
 import {
     Button, Form, Navbar, Input, UncontrolledDropdown, DropdownToggle,
     DropdownMenu, DropdownItem, Card, CardBody, CardTitle, CardSubtitle,
-    CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Table
+    CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Row, Col, Table
 } from "reactstrap";
 import {
     BsPlusLg, BsSearch, BsFillDiagram3Fill, BsBasketFill, BsBoxSeam,
-    BsListStars, BsInboxesFill, BsTable, BsPencilFill
+    BsListStars, BsInboxesFill, BsTable, BsPencilFill, BsFillTrashFill
 } from "react-icons/bs";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/transactions.css';
@@ -21,10 +21,17 @@ export class Warehouse extends Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
-            modal: false, modal2: false, data: [], accion: 0, id: 0,
-            description: "", address: ""
+            data: [],
+            accion: 0,
+            id: 0,
+            description: "",
+            address: "",
+            company: 1,
+            warehouseE: {}
         };
+
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -33,10 +40,58 @@ export class Warehouse extends Component {
             return response.json();
         }).then((dataApi) => {
             this.setState({ data: dataApi })
+            console.log(dataApi);
         }).catch(function (error) {
             console.log(error);
         })
     }
+
+    handleClick() {
+        const warehouse = {
+            warehouseId: this.state.id,
+            description: this.state.description,
+            address: this.state.address,
+            companyId: 1
+        };
+
+        console.log(warehouse);
+
+        switch (this.state.accion) {
+            case 1:
+                this.create(warehouse);
+                break;
+
+            case 2:
+                this.edit(warehouse);
+                break;
+
+            case 3:
+                warehouse.companyId= this.state.company;
+                this.delete(warehouse);
+                break;
+        }
+
+    }
+
+    handleChange = (e) => {
+        this.setState({ [e.target.name]: e.target.value });
+    };
+
+    mitoggle = () => {
+        this.setState({
+            accion: 0,
+            id: 0,
+            description: "",
+            address: "",
+            warehouseE: {}
+        });
+    }
+
+    mostrarModalAgregar = () => {
+        this.setState({
+            accion: 1
+        });
+    };
 
     create = (warehouse) => {
         const options = {
@@ -62,59 +117,91 @@ export class Warehouse extends Component {
                             address: warehouse.address
                         });
                         this.componentDidMount();
-                        this.setState({ accion: 0 });
-
+                        this.mitoogle();
                     }
                 }
             );
     }
 
-    handleClick() {
-        /*console.log('this is:', this);
-        console.log('e:', e.target);
-        console.log('e:', e);*/
-        //this.setState({ modalUpdate: true });
-        const warehouse = {
-            //WarehouseId: null,
-            Description: this.state.description,
-            Address: this.state.address,
-            CompanyId: 1
+    editar = (item) => {
+
+        fetch('/api/warehouses/' + item.warehouseId)
+            .then(response => { return response.json() })
+            .then(o => {
+                console.log("primer fetch " + o);
+                this.setState({
+                    accion: 2,
+                    id: o.warehouseId,
+                    description: o.description,
+                    address: o.address,
+                    company: o.companyId,
+                    warehouseE: o
+                });
+            });
+    }
+
+    edit = (warehouse) => {
+        const options = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(warehouse)
         };
 
-        console.log(warehouse);
-
-        switch (this.state.accion) {
-            case 1:
-                this.create(warehouse);
-                break;
-
-            case 2:
-                this.edit(warehouse);
-                break;
-        }
-
+        fetch('/api/warehouses/' + warehouse.warehouseId, options)
+            .then(
+                (response) => { return response.status; }
+            ).then(
+                (code) => {
+                    if (code == 204) {
+                        console.log(code);
+                        const warehouses = Array.from(this.state.data);
+                        warehouses.push({ warehouse });
+                        this.componentDidMount();
+                        this.mitoggle();
+                    }
+                }
+            );
     }
 
-    handleChange = (e) => {
-        if (e.target.name == 'warehouseId') {
-            const alm = Array.from(e.target.selectedOptions, option => option.value);
-            console.log(alm);
-            this.setState({ warehouseId: alm });
-            console.log(this.state);
-        } else {
-            this.setState({ [e.target.name]: e.target.value });
-        }
-    };
+    eliminar = (item) => {
 
-    mitoogle = () => {
-        this.setState({ accion: 0 });
+        fetch('/api/warehouses/' + item.warehouseId)
+            .then(response => { return response.json() })
+            .then(o => {
+                console.log(o);
+                this.setState({
+                    accion: 3,
+                    id: o.warehouseId,
+                    description: o.description,
+                    address: o.address,
+                    company: o.companyId,
+                    warehouseE: o
+                });
+            });
     }
 
-    mostrarModalAgregar = () => {
-        this.setState({
-            accion: 1,
-        });
-    };
+    delete = (warehouse) => {
+        const options = {
+            method: "DELETE"
+        };
+
+        fetch('/api/warehouses/' + warehouse.warehouseId, options)
+            .then(
+                (response) => { return response.status; }
+            ).then(
+                (code) => {
+                    if (code == 204 || code == 200) {
+                        console.log(code);
+                        const warehouses = Array.from(this.state.data);
+                        warehouses.pop({ warehouse });
+                        this.componentDidMount();
+                        this.mitoggle();
+                    }
+                }
+            );
+    }
 
     render() {
         return (
@@ -178,32 +265,7 @@ export class Warehouse extends Component {
                                     <div>
                                         <Button color="primary" onClick={() => this.mostrarModalAgregar()}><BsPlusLg /> Agregar </Button>
                                     </div>
-                                    <div>
-                                        <Modal isOpen={this.state.accion == 1} toggle={this.mitoggle} className={this.props.className} centered>
-                                            <ModalHeader toggle={this.mitoogle} className="text-dark" close={<Button onClick={this.mitoogle} className="btn-close"></Button>}>Agregar Almacen</ModalHeader>
-                                            <ModalBody className="text-dark">
-                                                <Form>
-                                                    <FormGroup>
-                                                        <label for="txt-company">ID del almacen</label>
-                                                        <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <label for="txt-company">Descripción del almacen</label>
-                                                        <input type="text" name="description" className="form-control mb-3" onChange={this.handleChange} value={this.state.description} placeholder="Empresa-X" />
-                                                    </FormGroup>
 
-                                                    <FormGroup>
-                                                        <label for="txt-company">Dirección del almacen</label>
-                                                        <input type="text" name="address" className="form-control mb-3" onChange={this.handleChange} value={this.state.address} placeholder="Juan López Zavala" />
-                                                    </FormGroup>
-                                                </Form>
-                                            </ModalBody>
-                                            <ModalFooter>
-                                                <Button color="primary" onClick={this.handleClick}>Agregar</Button>
-                                                <Button color="secondary" onClick={this.mitoogle}>Cancelar</Button>
-                                            </ModalFooter>
-                                        </Modal>
-                                    </div>
                                     <Table className="dt-responsive nowrap align-middle px-2">
                                         <thead>
                                             <tr>
@@ -220,38 +282,89 @@ export class Warehouse extends Component {
                                                         <th scope="row">{warehouses.warehouseId}</th>
                                                         <td>{warehouses.description}</td>
                                                         <td>{warehouses.address}</td>
-                                                        <td className="text-center"><Button type="button" onClick={this.toggle2} className="btn btn-primary">
+                                                        <td className="text-center"><Button type="button" onClick={() => this.editar(warehouses)} className="btn btn-primary">
                                                             <BsPencilFill /></Button>
-                                                            <Modal isOpen={this.state.modal2} toggle={this.toggle2} className={this.props.className} centered>
-                                                                <ModalHeader toggle={this.toggle2} className="text-dark" close={<Button onClick={this.toggle2} className="btn-close"></Button>}>Editar Almacen</ModalHeader>
-                                                                <ModalBody className="text-dark">
-                                                                    <Form>
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">ID del almacen</label>
-                                                                            <input type="text" className="form-control mb-3" placeholder="" disabled="true" />
-                                                                        </FormGroup>
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">Descripción del almacen</label>
-                                                                            <input type="text" name="description" className="form-control mb-3" placeholder="Empresa-X" />
-                                                                        </FormGroup>
-
-                                                                        <FormGroup>
-                                                                            <label for="txt-company">Dirección del almacen</label>
-                                                                            <input type="text" name="address" className="form-control mb-3" placeholder="Juan López Zavala" />
-                                                                        </FormGroup>
-                                                                    </Form>
-                                                                </ModalBody>
-                                                                <ModalFooter>
-                                                                    <Button color="primary" onClick={this.toggle2}>Editar</Button>
-                                                                    <Button color="secondary" onClick={this.toggle2}>Cancelar</Button>
-                                                                </ModalFooter>
-                                                            </Modal>
+                                                        </td>
+                                                        <td className="text-center"><Button type="button" onClick={() => this.eliminar(warehouses)} className="btn btn-danger">
+                                                            <BsFillTrashFill /></Button>
                                                         </td>
                                                     </tr>
                                                 )
                                             }
                                         </tbody>
                                     </Table>
+                                </div>
+                                <div>
+                                    <Modal
+                                        isOpen={this.state.accion > 0 && this.state.accion < 3 && true}
+                                        toggle={this.mitoggle}
+                                        className={this.props.className}
+                                        centered
+                                    >
+                                        <ModalHeader toggle={this.mitoggle} className="text-dark" close={<Button onClick={this.mitoggle} className="btn-close"></Button>}>Almacen</ModalHeader>
+                                        <ModalBody className="text-dark">
+                                            <Form>
+                                                <FormGroup>
+                                                    <label for="almacenId">ID del almacen</label>
+                                                    <input id="almacenId" name="alamacenId" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.id} />
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <label for="description">Descripción del almacen</label>
+                                                    <input type="description" name="description" className="form-control mb-3" onChange={this.handleChange} value={this.state.description} placeholder="Empresa-X" />
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <label for="address">Dirección del almacen</label>
+                                                    <input type="address" name="address" className="form-control mb-3" onChange={this.handleChange} value={this.state.address} placeholder="Juan López Zavala" />
+                                                </FormGroup>
+                                            </Form>
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button color="primary" onClick={this.handleClick}>Agregar</Button>
+                                            <Button color="secondary" onClick={this.mitoggle}>Cancelar</Button>
+                                        </ModalFooter>
+                                    </Modal>
+
+                                    <Modal
+                                        isOpen={this.state.accion == 3 && true}
+                                        centered
+                                        className={this.props.className}
+                                        toggle={this.mitoggle}>
+
+                                        <ModalHeader className="text-dark" close={<Button onClick={this.mitoggle} className="btn-close"></Button>}>
+                                            Eliminar
+                                        </ModalHeader>
+                                        <ModalBody className="text-dark">
+                                            ¿Desea elimninar?
+                                            <Row>
+                                                <Col md={2}>
+                                                    <FormGroup>
+                                                        <label for="elimination">ID</label>
+                                                        <input id="elimination" name="elimination" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.id} />
+                                                    </FormGroup>
+                                                </Col>
+                                                <Col md={10}>
+                                                    <FormGroup>
+                                                        <label for="movimiento">Descripción</label>
+                                                        <input id="movimiento" name="movimiento" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.description} />
+                                                    </FormGroup>
+                                                </Col>
+                                            </Row>
+
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button
+                                                color="danger"
+                                                onClick={this.handleClick}
+                                            >
+                                                Eliminar
+                                            </Button>
+                                            {' '}
+                                            <Button onClick={this.mitoggle}>
+                                                Cancelar
+                                            </Button>
+                                        </ModalFooter>
+                                    </Modal>
                                 </div>
                             </div>
                         </div>
