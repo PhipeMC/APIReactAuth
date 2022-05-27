@@ -28,11 +28,10 @@ export class NavMenu extends Component {
   componentDidMount() {
     authService.getUser().then(
       (u) => {
-        console.log(u);
-        const valo = authService.isValidUser(u);
-        console.log(valo);
-        this.setState({ isUserValid: valo });
-        console.log(valo);
+        if(u != null)
+          this.setState({ isUserConnected: true });
+        else
+          this.setState({ isUserConnected: false});
       }
     );
   }
@@ -68,7 +67,7 @@ export class NavMenu extends Component {
             <div className='navbar-collapse collapse w-100' id='collapsingNavbar3'>
               <ul className='navbar-nav w-100 justify-content-center'>
                 {
-                  this.state.isUserValid && <NavItem>
+                  this.state.isUserConnected && <NavItem>
                     <NavLink tag={Link} className="" to="/suppliers">Inventario</NavLink>
                   </NavItem>
                 }
