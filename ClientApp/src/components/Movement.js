@@ -16,21 +16,26 @@ export class Movement extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            //Guardar datos
             data: [],
             suppliers: [],
             companies: [],
             employees: [],
             warehouses: [],
+            products: [],
+            //Tablas
             accion: 0,
             movementId: 0,
             dateMov: "",
-            provName: null,//foranea
-            sourceWare: 0,//foranea
-            targetWare: null,//foranea
+            provName: null,//fk
+            sourceWare: 0,//fk
+            targetWare: null,//fk
             typeMov: "",
             notesMov: null,
-            empId: "",//foranea
+            empId: 0,//fk
             compania: 1,
+            productId: 0,
+            quantity: 0,
             movEditable: {},
             isUserValid: false,
             isGerente: false
@@ -51,6 +56,7 @@ export class Movement extends Component {
 
         authService.getAccessToken().then(
             (token) => {
+
                 const options = {
                     method: "GET",
                     headers: {
@@ -60,6 +66,7 @@ export class Movement extends Component {
                         }
                     }
                 };
+
                 fetch('/api/movements').then((response) => {
                     return response.json();
                 }).then((dataApi) => {
@@ -67,66 +74,83 @@ export class Movement extends Component {
                 }).catch(function (error) {
                     console.log(error);
                 });
+
+                //GET supplies data
+                fetch('/api/suppliers').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ suppliers: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
+                //GET campanies data
+                fetch('/api/companies').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ companies: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
+                //GET employees data
+                fetch('/api/employees').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ employees: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
+                //GET warehouses data
+                fetch('/api/warehouses').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ warehouses: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
+                //GET products data
+                fetch('/api/products').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ products: dataApi })
+                    console.log(dataApi);
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
             }
         )
 
-        fetch('/api/suppliers').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ suppliers: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/companies').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ companies: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/employees').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ employees: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/warehouses').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ warehouses: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
     }
 
+    //Close modal, restores state values
     mitoggle = () => {
         this.setState({
             accion: 0,
             movementId: 0,
             dateMov: "",
-            provName: null,//foranea
-            sourceWare: 0,//foranea
-            targetWare: null,//foranea
+            provName: null,
+            sourceWare: 0,
+            targetWare: null,
             typeMov: "",
             notesMov: null,
-            empId: 0,//foranea
+            empId: 0,
             compania: 1
         });
     }
 
+    //Changes state accion value to open Add Modal 
     mostrarInsertar = () => {
         this.setState({
             accion: 1
-
         });
     }
 
+    //Updates state values when inputs  
     handleChange = (event) => {
-        //Actualizo el estado segun los valores
         this.setState({ [event.target.name]: event.target.value });
     }
 
@@ -341,7 +365,7 @@ export class Movement extends Component {
                                     {
                                         this.state.isUserValid &&
                                         <div>
-                                            <Button color="primary" onClick={this.mostrarInsertar}><BsPlusLg /> Agregar </Button>
+                                            <Button color="success" onClick={this.mostrarInsertar}><BsPlusLg /> Agregar </Button>
                                         </div>
                                     }
 
@@ -405,14 +429,20 @@ export class Movement extends Component {
                                             <ModalHeader toggle={this.mitoggle} className="text-dark" close={<Button onClick={this.mitoggle} className="btn-close"></Button>}>Movimiento</ModalHeader>
                                             <ModalBody className="text-dark">
                                                 <Form>
-                                                    <FormGroup>
-                                                        <label for="movementId">ID del movimiento</label>
-                                                        <input id="movementId" name="movementId" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.movementId} />
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <label for="dateMov">Fecha del movimiento*</label>
-                                                        <input id="dateMov" name="dateMov" type="date" className="form-control mb-3" onChange={this.handleChange} value={this.state.dateMov} />
-                                                    </FormGroup>
+                                                    <Row>
+                                                        <Col md={4}>
+                                                            <FormGroup>
+                                                                <label for="movementId">ID movimiento</label>
+                                                                <input id="movementId" name="movementId" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.movementId} />
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col md={8}>
+                                                            <FormGroup>
+                                                                <label for="dateMov">Fecha del movimiento*</label>
+                                                                <input id="dateMov" name="dateMov" type="date" className="form-control mb-3" onChange={this.handleChange} value={this.state.dateMov} />
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
 
                                                     <FormGroup>
                                                         <label for="provName">Proovedor</label>
@@ -427,6 +457,25 @@ export class Movement extends Component {
                                                     </FormGroup>
 
                                                     <Row>
+                                                        <Col md={8}>
+                                                            <FormGroup>
+                                                                <label for="productId">Producto*</label>
+                                                                <select id="productId" name="productId" class="form-select mb-3 " aria-label="Default select example" onChange={this.handleChange} value={this.state.productId}>
+                                                                    <option>Selecciona...</option>
+                                                                    {
+                                                                        this.state.products.map(p =>
+                                                                            <option class="text-dark" value={p.productId}>{p.productName}</option>
+                                                                        )
+                                                                    }
+                                                                </select>
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col md={4}>
+                                                            <FormGroup>
+                                                                <label for="quantity">Cantidad</label>
+                                                                <input id="quantity" name="quantity" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.quantity} />
+                                                            </FormGroup>
+                                                        </Col>
 
                                                         <Col md={6}>
                                                             <FormGroup>
