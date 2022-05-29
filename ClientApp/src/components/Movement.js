@@ -16,21 +16,26 @@ export class Movement extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            //Guardar datos
             data: [],
             suppliers: [],
             companies: [],
             employees: [],
             warehouses: [],
+            products: [],
+            //Tablas
             accion: 0,
             movementId: 0,
             dateMov: "",
-            provName: null,//foranea
-            sourceWare: 0,//foranea
-            targetWare: null,//foranea
+            provName: null,//fk
+            sourceWare: 0,//fk
+            targetWare: null,//fk
             typeMov: "",
             notesMov: null,
-            empId: "",//foranea
+            empId: 0,//fk
             compania: 1,
+            productId: 0,
+            quantity: null,
             movEditable: {},
             isUserValid: false,
             isGerente: false
@@ -51,6 +56,7 @@ export class Movement extends Component {
 
         authService.getAccessToken().then(
             (token) => {
+
                 const options = {
                     method: "GET",
                     headers: {
@@ -60,93 +66,114 @@ export class Movement extends Component {
                         }
                     }
                 };
+
                 fetch('/api/movements').then((response) => {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ data: dataApi })
+                    console.log(dataApi);
                 }).catch(function (error) {
                     console.log(error);
                 });
+
+                //GET supplies data
+                fetch('/api/suppliers').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ suppliers: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
+                //GET campanies data
+                fetch('/api/companies').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ companies: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
+                //GET employees data
+                fetch('/api/employees').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ employees: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
+                //GET warehouses data
+                fetch('/api/warehouses').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ warehouses: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
+                //GET products data
+                fetch('/api/products').then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ products: dataApi })
+                    //console.log(dataApi);
+                }).catch(function (error) {
+                    console.log(error);
+                })
+
             }
         )
 
-        fetch('/api/suppliers').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ suppliers: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/companies').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ companies: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/employees').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ employees: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        fetch('/api/warehouses').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ warehouses: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
     }
 
+    //Close modal, restores state values
     mitoggle = () => {
         this.setState({
             accion: 0,
             movementId: 0,
             dateMov: "",
-            provName: null,//foranea
-            sourceWare: 0,//foranea
-            targetWare: null,//foranea
+            provName: null,
+            sourceWare: 0,
+            targetWare: null,
             typeMov: "",
             notesMov: null,
-            empId: 0,//foranea
-            compania: 1
+            empId: 0,
+            compania: 1,
+            productId: 0,
+            quantity: 0
         });
     }
 
+    //Changes state accion value to open Add Modal 
     mostrarInsertar = () => {
-        this.setState({
-            accion: 1
-
-        });
+        this.setState({ accion: 1 });
     }
 
+    //Updates state values when inputs  
     handleChange = (event) => {
-        //Actualizo el estado segun los valores
         this.setState({ [event.target.name]: event.target.value });
     }
 
     handleClick() {
 
+        var movimiento = {
+            movementId: 0, //
+            date: this.state.dateMov, //
+            supplierId: this.state.provName,
+            originWarehouseId: this.state.sourceWare,
+            targetWarehouseId: this.state.targetWare,
+            type: this.state.typeMov,
+            notes: this.state.notesMov,
+            companyId: 1, //
+            employeeId: this.state.empId
+        }
+
+        var fecha = this.state.dateMov + "T00:00:00.000Z"
+
         if (this.state.accion === 1) {
 
-            var fecha = this.state.dateMov + "T00:00:00.000Z"
-
-            var movimiento = {
-                movementId: 0,
-                date: fecha,
-                supplierId: this.state.provName,
-                originWarehouseId: this.state.sourceWare,
-                targetWarehouseId: this.state.targetWare,
-                type: this.state.typeMov,
-                notes: this.state.notesMov,
-                companyId: 1,
-                employeeId: this.state.empId
-            }
+            movimiento.date = fecha;
 
             const options = {
                 method: "POST",
@@ -156,12 +183,12 @@ export class Movement extends Component {
                 body: JSON.stringify(movimiento)
             };
 
-            fetch('/api/movements', options)
+            fetch('/api/movements?productId='+this.state.productId+"&quantity="+this.state.quantity, options)
                 .then(
                     (response) => { return response.status; }
                 ).then(
                     (code) => {
-                        if (code == 201) {
+                        if (code === 201) {
                             console.log(code);
                             const allMoves = Array.from(this.state.data);
                             allMoves.push(movimiento);
@@ -171,20 +198,10 @@ export class Movement extends Component {
                     }
                 );
         }
-        else if (this.state.accion == 2) {
-            var fecha = this.state.dateMov + "T00:00:00.000Z"
-
-            var movimiento = {
-                movementId: this.state.movementId,
-                date: fecha,
-                supplierId: this.state.provName,
-                originWarehouseId: this.state.sourceWare,
-                targetWarehouseId: this.state.targetWare,
-                type: this.state.typeMov,
-                notes: this.state.notesMov,
-                companyId: this.state.compania,
-                employeeId: this.state.empId
-            }
+        else if (this.state.accion === 2) {
+            movimiento.movementId = this.state.movementId
+            movimiento.date = fecha;
+            movimiento.companyId = this.state.compania;
 
             const options = {
                 method: "PUT",
@@ -200,7 +217,7 @@ export class Movement extends Component {
                 ).then(
                     (code) => {
                         console.log(code);
-                        if (code == 204) {
+                        if (code === 204) {
                             console.log(code);
                             const allMoves = Array.from(this.state.data);
                             allMoves.push(movimiento);
@@ -212,17 +229,8 @@ export class Movement extends Component {
         }
         else if (this.state.accion === 3) {
 
-            var movimiento = {
-                movementId: this.state.movementId,
-                date: this.state.movEditable.date,
-                supplierId: this.state.movEditable.supplierId,
-                originWarehouseId: this.state.movEditable.originWarehouseId,
-                targetWarehouseId: this.state.movEditable.targetWarehouseId,
-                type: this.state.movEditable.type,
-                notes: this.state.movEditable.notes,
-                companyId: 1,
-                employeeId: this.state.movEditable.employeeId
-            }
+            movimiento.movementId = this.state.movementId
+            movimiento.companyId = this.state.compania;
 
             const options = {
                 method: "DELETE"
@@ -234,7 +242,7 @@ export class Movement extends Component {
                 ).then(
                     (code) => {
                         console.log("El código es: " + code);
-                        if (code == 204 || code == 200) {
+                        if (code === 204 || code === 200) {
                             console.log(code);
                             const allMoves = Array.from(this.state.data);
                             allMoves.pop(movimiento);
@@ -275,7 +283,19 @@ export class Movement extends Component {
             .then(response => { return response.json() })
             .then(o => {
                 console.log(o);
-                this.setState({ accion: 3, movEditable: o, movementId: o.movementId, typeMov: o.type })
+                this.setState({
+                    accion: 3,
+                    movementId: o.movementId,
+                    dateMov: o.date.slice(0, 10),
+                    provName: o.supplierId,//foranea
+                    sourceWare: o.originWarehouseId,//foranea
+                    targetWare: o.targetWarehouseId,//foranea
+                    typeMov: o.type,
+                    notesMov: o.notes,
+                    empId: o.employeeId,//foranea
+                    compania: o.companyId,
+                    movEditable: o,
+                });
             });
     }
 
@@ -341,7 +361,7 @@ export class Movement extends Component {
                                     {
                                         this.state.isUserValid &&
                                         <div>
-                                            <Button color="primary" onClick={this.mostrarInsertar}><BsPlusLg /> Agregar </Button>
+                                            <Button color="success" onClick={this.mostrarInsertar}><BsPlusLg /> Agregar </Button>
                                         </div>
                                     }
 
@@ -405,14 +425,20 @@ export class Movement extends Component {
                                             <ModalHeader toggle={this.mitoggle} className="text-dark" close={<Button onClick={this.mitoggle} className="btn-close"></Button>}>Movimiento</ModalHeader>
                                             <ModalBody className="text-dark">
                                                 <Form>
-                                                    <FormGroup>
-                                                        <label for="movementId">ID del movimiento</label>
-                                                        <input id="movementId" name="movementId" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.movementId} />
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <label for="dateMov">Fecha del movimiento*</label>
-                                                        <input id="dateMov" name="dateMov" type="date" className="form-control mb-3" onChange={this.handleChange} value={this.state.dateMov} />
-                                                    </FormGroup>
+                                                    <Row>
+                                                        <Col md={4}>
+                                                            <FormGroup>
+                                                                <label for="movementId">ID movimiento</label>
+                                                                <input id="movementId" name="movementId" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.movementId} />
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col md={8}>
+                                                            <FormGroup>
+                                                                <label for="dateMov">Fecha del movimiento*</label>
+                                                                <input id="dateMov" name="dateMov" type="date" className="form-control mb-3" onChange={this.handleChange} value={this.state.dateMov} />
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
 
                                                     <FormGroup>
                                                         <label for="provName">Proovedor</label>
@@ -427,6 +453,25 @@ export class Movement extends Component {
                                                     </FormGroup>
 
                                                     <Row>
+                                                        <Col md={8}>
+                                                            <FormGroup>
+                                                                <label for="productId">Producto*</label>
+                                                                <select id="productId" name="productId" class="form-select mb-3 " aria-label="Default select example" onChange={this.handleChange} value={this.state.productId}>
+                                                                    <option>Selecciona...</option>
+                                                                    {
+                                                                        this.state.products.map(p =>
+                                                                            <option class="text-dark" value={p.productId}>{p.productName}</option>
+                                                                        )
+                                                                    }
+                                                                </select>
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col md={4}>
+                                                            <FormGroup>
+                                                                <label for="quantity">Cantidad</label>
+                                                                <input id="quantity" name="quantity" type="number" className="form-control mb-3"  onChange={this.handleChange} value={this.state.quantity} />
+                                                            </FormGroup>
+                                                        </Col>
 
                                                         <Col md={6}>
                                                             <FormGroup>
@@ -493,7 +538,7 @@ export class Movement extends Component {
                                         </Modal>
 
                                         <Modal
-                                            isOpen={this.state.accion == 3 && true}
+                                            isOpen={this.state.accion === 3 && true}
                                             centered
                                             toggle={this.mitoogle}>
 
