@@ -45,16 +45,13 @@ export class Warehouse extends Component {
 
         authService.getAccessToken().then(
             (token) => {
+                
                 const options = {
-                    method: "GET",
-                    headers: {
-                        headers: !token ? {} : {
-                            'Authorization': `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        }
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
                     }
-                };
-                fetch('/api/warehouses').then((response) => {
+                }
+                fetch('api/warehouses', options).then((response) => {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ data: dataApi })
@@ -113,7 +110,38 @@ export class Warehouse extends Component {
     };
 
     create = (warehouse) => {
-        const options = {
+        authService.getAccessToken().then(
+            (token) => {
+                
+                const options = {
+                    method: "POST",
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(warehouse)
+                }
+                fetch('api/warehouses', options).then(
+                    (response) => { return response.status; }
+                ).then(
+                    (code) => {
+                        if (code == 201) {
+                            console.log(code);
+                            const warehouses = Array.from(this.state.data);
+                            warehouses.push({
+                                warehouseId: warehouse.warehouseId,
+                                description: warehouse.description,
+                                address: warehouse.address
+                            });
+                            this.componentDidMount();
+                            this.mitoggle();
+                        }
+                    }
+                );
+            }
+        )
+
+        /*const options = {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -128,7 +156,6 @@ export class Warehouse extends Component {
                 (code) => {
                     if (code == 201) {
                         console.log(code);
-
                         const warehouses = Array.from(this.state.data);
                         warehouses.push({
                             warehouseId: warehouse.warehouseId,
@@ -139,87 +166,124 @@ export class Warehouse extends Component {
                         this.mitoggle();
                     }
                 }
-            );
+            );*/
     }
 
     editar = (item) => {
-
-        fetch('/api/warehouses/' + item.warehouseId)
-            .then(response => { return response.json() })
-            .then(o => {
-                console.log("primer fetch " + o);
-                this.setState({
-                    accion: 2,
-                    id: o.warehouseId,
-                    description: o.description,
-                    address: o.address,
-                    company: o.companyId,
-                    warehouseE: o
-                });
-            });
+        authService.getAccessToken().then(
+            (token) => {
+                
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/warehouses/' + item.warehouseId, options)
+                    .then(response => { return response.json() })
+                    .then(o => {
+                        console.log("primer fetch " + o);
+                        this.setState({
+                            accion: 2,
+                            id: o.warehouseId,
+                            description: o.description,
+                            address: o.address,
+                            company: o.companyId,
+                            warehouseE: o
+                        });
+                    });
+            }
+        )
     }
 
     edit = (warehouse) => {
-        const options = {
+        /*const options = {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(warehouse)
-        };
+        };*/
 
-        fetch('/api/warehouses/' + warehouse.warehouseId, options)
-            .then(
-                (response) => { return response.status; }
-            ).then(
-                (code) => {
-                    if (code == 204) {
-                        console.log(code);
-                        const warehouses = Array.from(this.state.data);
-                        warehouses.push({ warehouse });
-                        this.componentDidMount();
-                        this.mitoggle();
-                    }
+        authService.getAccessToken().then(
+            (token) => {
+                
+                const options = {
+                    method: "PUT",
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(warehouse)
                 }
-            );
+                fetch('api/warehouses/' + warehouse.warehouseId, options)
+                    .then(
+                        (response) => { return response.status; }
+                    ).then(
+                        (code) => {
+                            if (code == 204) {
+                                const warehouses = Array.from(this.state.data);
+                                warehouses.push({ warehouse });
+                                this.componentDidMount();
+                                this.mitoggle();
+                            }
+                        }
+                    );
+            }
+        )
     }
 
     eliminar = (item) => {
-
-        fetch('/api/warehouses/' + item.warehouseId)
-            .then(response => { return response.json() })
-            .then(o => {
-                console.log(o);
-                this.setState({
-                    accion: 3,
-                    id: o.warehouseId,
-                    description: o.description,
-                    address: o.address,
-                    company: o.companyId,
-                    warehouseE: o
-                });
-            });
+        authService.getAccessToken().then(
+            (token) => {
+                
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/warehouses/' + item.warehouseId, options)
+                    .then(response => { return response.json() })
+                    .then(o => {
+                        console.log(o);
+                        this.setState({
+                            accion: 3,
+                            id: o.warehouseId,
+                            description: o.description,
+                            address: o.address,
+                            company: o.companyId,
+                            warehouseE: o
+                        });
+                    });
+            }
+        )
     }
 
     delete = (warehouse) => {
-        const options = {
-            method: "DELETE"
-        };
-
-        fetch('/api/warehouses/' + warehouse.warehouseId, options)
-            .then(
-                (response) => { return response.status; }
-            ).then(
-                (code) => {
-                    if (code == 204 || code == 200) {
-                        console.log(code);
-                        const warehouses = Array.from(this.state.data);
-                        warehouses.pop({ warehouse });
-                        this.componentDidMount();
-                        this.mitoggle();
+        authService.getAccessToken().then(
+            (token) => {
+                
+                const options = {
+                    method: "DELETE",
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
                     }
                 }
-            );
+                fetch('/api/warehouses/' + warehouse.warehouseId, options)
+                    .then(
+                        (response) => { return response.status; }
+                    ).then(
+                        (code) => {
+                            if (code == 204 || code == 200) {
+                                console.log(code);
+                                const warehouses = Array.from(this.state.data);
+                                warehouses.pop({ warehouse });
+                                this.componentDidMount();
+                                this.mitoggle();
+                            }
+                        }
+                    );
+            }
+        )
     }
 
     render() {

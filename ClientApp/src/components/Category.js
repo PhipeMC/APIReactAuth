@@ -24,13 +24,23 @@ export class Category extends Component {
     }
 
     componentDidMount() {
-        fetch('/api/categories').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ data: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
+        authService.getAccessToken().then(
+            (token) => {
+                console.log("Token: " + token);
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('api/categories', options).then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ data: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        )
 
         authService.getUser().then(
             (u) => {

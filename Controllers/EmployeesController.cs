@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using APIReactAuth.Data;
 using APIReactAuth.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryWebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeesController : ControllerBase
@@ -17,6 +19,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Employees
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
@@ -24,6 +27,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpGet]
         [Route("ByCompany")]
         public IEnumerable<Object> GetEmployeesByCompany()
@@ -38,6 +42,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpGet]
         [Route("top5")]
         public IEnumerable<Object> GetTop5()
@@ -73,6 +78,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Employees/5
+        [Authorize(Policy = "AllRole")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Employee>> GetEmployee(int id)
         {
@@ -88,6 +94,7 @@ namespace InventoryWebApi.Controllers
 
         // PUT: api/Employees/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "AllRole")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEmployee(int id, Employee employee)
         {
@@ -119,6 +126,7 @@ namespace InventoryWebApi.Controllers
 
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
         {
@@ -129,6 +137,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // DELETE: api/Employees/5
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
