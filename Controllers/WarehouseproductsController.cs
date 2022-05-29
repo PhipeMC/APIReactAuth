@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using APIReactAuth.Data;
 using APIReactAuth.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryWebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class WarehouseproductsController : ControllerBase
@@ -17,6 +19,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Warehouseproducts
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Warehouseproduct>>> GetWarehouseproducts()
         {
@@ -28,6 +31,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Warehouseproducts/5
+        [Authorize(Policy = "AllRole")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Warehouseproduct>> GetWarehouseproduct(int id)
         {
@@ -47,6 +51,7 @@ namespace InventoryWebApi.Controllers
 
         // PUT: api/Warehouseproducts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "AllRole")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutWarehouseproduct(int id, Warehouseproduct warehouseproduct)
         {
@@ -78,6 +83,7 @@ namespace InventoryWebApi.Controllers
 
         // POST: api/Warehouseproducts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost]
         public async Task<ActionResult<Warehouseproduct>> PostWarehouseproduct(Warehouseproduct warehouseproduct)
         {
@@ -106,6 +112,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // DELETE: api/Warehouseproducts/5
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWarehouseproduct(int id)
         {

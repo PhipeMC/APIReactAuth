@@ -27,7 +27,6 @@ export class AuthorizeService {
         var authorized = false;
         if (user) {
             var userRoles = this.ensureArray(user.role);
-            console.log(userRoles);
             requiredAnyRoles.forEach(role => {
                 if (userRoles.indexOf(role) > -1) {
                     authorized = true;
