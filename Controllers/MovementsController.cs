@@ -79,16 +79,101 @@ namespace InventoryWebApi.Controllers
         // POST: api/Movements
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Movement>> PostMovement(Movement movement)
+        public async Task<ActionResult<Movement>> PostMovement(Movement movement, int productId, int quantity)
         {
-            if (_context.Movements == null)
+            if (_context.Movements != null)
             {
-                return Problem("Entity set 'NorthwindContext.Movements'  is null.");
-            }
-            _context.Movements.Add(movement);
-            await _context.SaveChangesAsync();
+                if (movement.Type == "VENTA" || movement.Type == "TRASPASO")
+                {
 
-            return CreatedAtAction("GetMovement", new { id = movement.MovementId }, movement);
+                    if (movement.OriginWarehouseId > 0)
+                    {
+                        Warehouseproduct wp = await _context.Warehouseproducts.FindAsync(movement.OriginWarehouseId, productId);
+
+                        if (wp == null)
+                        {
+                            //404 no se encontro el warehouse
+                            return NotFound();
+                        }
+
+                        if (wp.UnitsInStock >= quantity)
+                        {
+                            if (movement.TargetWarehouseId != null)
+                            {
+                                Warehouseproduct wpt = await _context.Warehouseproducts.FindAsync(movement.TargetWarehouseId, productId);
+                                if (wpt != null)
+                                {
+                                    wp.UnitsInStock -= (short)quantity;
+                                    _context.Entry(wp).State = EntityState.Modified;
+                                    wpt.UnitsInStock += (short)quantity;
+                                    _context.Entry(wpt).State = EntityState.Modified;
+                                }
+                                else
+                                {
+                                    //404 no se encontró el destino marcado
+                                    return NotFound();
+                                }
+                            }
+                            else
+                            {
+                                wp.UnitsInStock -= (short)quantity;
+                                _context.Entry(wp).State = EntityState.Modified;
+                            }
+                        }
+                        else
+                        {
+                            //400 No se pudo realizar la operación, no da la cantidad
+                            return BadRequest();
+                        }
+
+                    }
+
+                }
+                else if (movement.Type == "COMPRA" || movement.Type == "AJUSTE")
+                {
+
+                    if (movement.OriginWarehouseId > 0)
+                    {
+                        Warehouseproduct wp = await _context.Warehouseproducts.FindAsync(movement.OriginWarehouseId, productId);
+
+                        if (wp == null)
+                        {
+                            //404 no se encontro el warehouse
+                            return NotFound();
+                        }
+
+                        if (movement.TargetWarehouseId != null)
+                        {
+                            Warehouseproduct wpt = await _context.Warehouseproducts.FindAsync(movement.TargetWarehouseId, productId);
+                            if (wpt.UnitsInStock >= quantity)
+                            {
+                                wpt.UnitsInStock -= (short)quantity;
+                                _context.Entry(wpt).State = EntityState.Modified;
+                                wp.UnitsInStock += (short)quantity;
+                                _context.Entry(wp).State = EntityState.Modified;
+                            }
+                            else
+                            {
+                                //404 no se encontró el destino marcado
+                                return NotFound();
+                            }
+                        }
+                        else
+                        {
+                            wp.UnitsInStock += (short)quantity;
+                            _context.Entry(wp).State = EntityState.Modified;
+                        }
+
+                    }
+
+                }
+                _context.Movements.Add(movement);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetMovement", new { id = movement.MovementId }, movement);
+            }
+
+            return Problem("Entity set 'NorthwindContext.Movements'  is null.");
         }
 
         // DELETE: api/Movements/5

@@ -35,7 +35,7 @@ export class Movement extends Component {
             empId: 0,//fk
             compania: 1,
             productId: 0,
-            quantity: 0,
+            quantity: null,
             movEditable: {},
             isUserValid: false,
             isGerente: false
@@ -71,6 +71,7 @@ export class Movement extends Component {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ data: dataApi })
+                    console.log(dataApi);
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -116,7 +117,7 @@ export class Movement extends Component {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ products: dataApi })
-                    console.log(dataApi);
+                    //console.log(dataApi);
                 }).catch(function (error) {
                     console.log(error);
                 })
@@ -138,15 +139,15 @@ export class Movement extends Component {
             typeMov: "",
             notesMov: null,
             empId: 0,
-            compania: 1
+            compania: 1,
+            productId: 0,
+            quantity: 0
         });
     }
 
     //Changes state accion value to open Add Modal 
     mostrarInsertar = () => {
-        this.setState({
-            accion: 1
-        });
+        this.setState({ accion: 1 });
     }
 
     //Updates state values when inputs  
@@ -156,21 +157,23 @@ export class Movement extends Component {
 
     handleClick() {
 
+        var movimiento = {
+            movementId: 0, //
+            date: this.state.dateMov, //
+            supplierId: this.state.provName,
+            originWarehouseId: this.state.sourceWare,
+            targetWarehouseId: this.state.targetWare,
+            type: this.state.typeMov,
+            notes: this.state.notesMov,
+            companyId: 1, //
+            employeeId: this.state.empId
+        }
+
+        var fecha = this.state.dateMov + "T00:00:00.000Z"
+
         if (this.state.accion === 1) {
 
-            var fecha = this.state.dateMov + "T00:00:00.000Z"
-
-            var movimiento = {
-                movementId: 0,
-                date: fecha,
-                supplierId: this.state.provName,
-                originWarehouseId: this.state.sourceWare,
-                targetWarehouseId: this.state.targetWare,
-                type: this.state.typeMov,
-                notes: this.state.notesMov,
-                companyId: 1,
-                employeeId: this.state.empId
-            }
+            movimiento.date = fecha;
 
             const options = {
                 method: "POST",
@@ -180,12 +183,12 @@ export class Movement extends Component {
                 body: JSON.stringify(movimiento)
             };
 
-            fetch('/api/movements', options)
+            fetch('/api/movements?productId='+this.state.productId+"&quantity="+this.state.quantity, options)
                 .then(
                     (response) => { return response.status; }
                 ).then(
                     (code) => {
-                        if (code == 201) {
+                        if (code === 201) {
                             console.log(code);
                             const allMoves = Array.from(this.state.data);
                             allMoves.push(movimiento);
@@ -195,20 +198,10 @@ export class Movement extends Component {
                     }
                 );
         }
-        else if (this.state.accion == 2) {
-            var fecha = this.state.dateMov + "T00:00:00.000Z"
-
-            var movimiento = {
-                movementId: this.state.movementId,
-                date: fecha,
-                supplierId: this.state.provName,
-                originWarehouseId: this.state.sourceWare,
-                targetWarehouseId: this.state.targetWare,
-                type: this.state.typeMov,
-                notes: this.state.notesMov,
-                companyId: this.state.compania,
-                employeeId: this.state.empId
-            }
+        else if (this.state.accion === 2) {
+            movimiento.movementId = this.state.movementId
+            movimiento.date = fecha;
+            movimiento.companyId = this.state.compania;
 
             const options = {
                 method: "PUT",
@@ -224,7 +217,7 @@ export class Movement extends Component {
                 ).then(
                     (code) => {
                         console.log(code);
-                        if (code == 204) {
+                        if (code === 204) {
                             console.log(code);
                             const allMoves = Array.from(this.state.data);
                             allMoves.push(movimiento);
@@ -236,17 +229,8 @@ export class Movement extends Component {
         }
         else if (this.state.accion === 3) {
 
-            var movimiento = {
-                movementId: this.state.movementId,
-                date: this.state.movEditable.date,
-                supplierId: this.state.movEditable.supplierId,
-                originWarehouseId: this.state.movEditable.originWarehouseId,
-                targetWarehouseId: this.state.movEditable.targetWarehouseId,
-                type: this.state.movEditable.type,
-                notes: this.state.movEditable.notes,
-                companyId: 1,
-                employeeId: this.state.movEditable.employeeId
-            }
+            movimiento.movementId = this.state.movementId
+            movimiento.companyId = this.state.compania;
 
             const options = {
                 method: "DELETE"
@@ -258,7 +242,7 @@ export class Movement extends Component {
                 ).then(
                     (code) => {
                         console.log("El código es: " + code);
-                        if (code == 204 || code == 200) {
+                        if (code === 204 || code === 200) {
                             console.log(code);
                             const allMoves = Array.from(this.state.data);
                             allMoves.pop(movimiento);
@@ -299,7 +283,19 @@ export class Movement extends Component {
             .then(response => { return response.json() })
             .then(o => {
                 console.log(o);
-                this.setState({ accion: 3, movEditable: o, movementId: o.movementId, typeMov: o.type })
+                this.setState({
+                    accion: 3,
+                    movementId: o.movementId,
+                    dateMov: o.date.slice(0, 10),
+                    provName: o.supplierId,//foranea
+                    sourceWare: o.originWarehouseId,//foranea
+                    targetWare: o.targetWarehouseId,//foranea
+                    typeMov: o.type,
+                    notesMov: o.notes,
+                    empId: o.employeeId,//foranea
+                    compania: o.companyId,
+                    movEditable: o,
+                });
             });
     }
 
@@ -473,7 +469,7 @@ export class Movement extends Component {
                                                         <Col md={4}>
                                                             <FormGroup>
                                                                 <label for="quantity">Cantidad</label>
-                                                                <input id="quantity" name="quantity" type="text" className="form-control mb-3" placeholder="" disabled="true" value={this.state.quantity} />
+                                                                <input id="quantity" name="quantity" type="number" className="form-control mb-3"  onChange={this.handleChange} value={this.state.quantity} />
                                                             </FormGroup>
                                                         </Col>
 
@@ -542,7 +538,7 @@ export class Movement extends Component {
                                         </Modal>
 
                                         <Modal
-                                            isOpen={this.state.accion == 3 && true}
+                                            isOpen={this.state.accion === 3 && true}
                                             centered
                                             toggle={this.mitoogle}>
 
