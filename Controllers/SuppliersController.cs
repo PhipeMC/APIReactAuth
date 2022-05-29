@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using APIReactAuth.Data;
 using APIReactAuth.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryWebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SuppliersController : ControllerBase
@@ -17,6 +19,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Suppliers
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Supplier>>> GetSuppliers()
         {
@@ -28,6 +31,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Suppliers/5
+        [Authorize(Policy = "AllRole")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Supplier>> GetSupplier(int id)
         {
@@ -47,6 +51,7 @@ namespace InventoryWebApi.Controllers
 
         // PUT: api/Suppliers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "AllRole")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSupplier(int id, Supplier supplier)
         {
@@ -78,6 +83,7 @@ namespace InventoryWebApi.Controllers
 
         // POST: api/Suppliers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost]
         public async Task<ActionResult<Supplier>> PostSupplier(Supplier supplier)
         {
@@ -92,6 +98,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // DELETE: api/Suppliers/5
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSupplier(int id)
         {

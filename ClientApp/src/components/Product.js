@@ -24,13 +24,23 @@ export class Product extends Component {
     }
 
     componentDidMount() {
-        fetch('/api/products').then((response) => {
-            return response.json();
-        }).then((dataApi) => {
-            this.setState({ data: dataApi })
-        }).catch(function (error) {
-            console.log(error);
-        })
+        authService.getAccessToken().then(
+            (token) => {
+                console.log("Token: " + token);
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('api/products', options).then((response) => {
+                    return response.json();
+                }).then((dataApi) => {
+                    this.setState({ data: dataApi })
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        )
 
         authService.getUser().then(
             (u) => {

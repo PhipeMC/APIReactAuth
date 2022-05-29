@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using APIReactAuth.Data;
 using APIReactAuth.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryWebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
@@ -17,6 +19,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Products
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
@@ -28,6 +31,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Products/5
+        [Authorize(Policy = "AllRole")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
@@ -47,6 +51,7 @@ namespace InventoryWebApi.Controllers
 
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "AllRole")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(int id, Product product)
         {
@@ -78,6 +83,7 @@ namespace InventoryWebApi.Controllers
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
@@ -92,6 +98,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // DELETE: api/Products/5
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
@@ -110,32 +117,6 @@ namespace InventoryWebApi.Controllers
 
             return NoContent();
         }
-
-        /*[HttpGet]
-        public async Task<ActionResult> GetMaxProduct()
-        {
-            if (_context.Products == null)
-            {
-                return NotFound();
-            }
-            var product =
-                (from wp in _context.Warehouseproducts
-                join p in _context.Products
-                on wp.ProductId equals p.ProductId
-                orderby wp.UnitsInStock descending
-                where wp.Discontinued != 0
-                select new {
-                    Name = p.ProductName,
-                    Quantity = wp.UnitsInStock
-                }).Take(1);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return product;
-        }*/
 
         private bool ProductExists(int id)
         {

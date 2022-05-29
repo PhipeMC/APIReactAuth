@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using APIReactAuth.Data;
 using APIReactAuth.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryWebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CompaniesController : ControllerBase
@@ -17,24 +19,26 @@ namespace InventoryWebApi.Controllers
         }
 
         // GET: api/Companies
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
         {
-          if (_context.Companies == null)
-          {
-              return NotFound();
-          }
+            if (_context.Companies == null)
+            {
+                return NotFound();
+            }
             return await _context.Companies.ToListAsync();
         }
 
         // GET: api/Companies/5
+        [Authorize(Policy = "AllRole")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Company>> GetCompany(int id)
         {
-          if (_context.Companies == null)
-          {
-              return NotFound();
-          }
+            if (_context.Companies == null)
+            {
+                return NotFound();
+            }
             var company = await _context.Companies.FindAsync(id);
 
             if (company == null)
@@ -47,6 +51,7 @@ namespace InventoryWebApi.Controllers
 
         // PUT: api/Companies/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "AllRole")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCompany(int id, Company company)
         {
@@ -78,13 +83,14 @@ namespace InventoryWebApi.Controllers
 
         // POST: api/Companies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost]
         public async Task<ActionResult<Company>> PostCompany(Company company)
         {
-          if (_context.Companies == null)
-          {
-              return Problem("Entity set 'NorthwindContext.Companies'  is null.");
-          }
+            if (_context.Companies == null)
+            {
+                return Problem("Entity set 'NorthwindContext.Companies'  is null.");
+            }
             _context.Companies.Add(company);
             await _context.SaveChangesAsync();
 
@@ -92,6 +98,7 @@ namespace InventoryWebApi.Controllers
         }
 
         // DELETE: api/Companies/5
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
