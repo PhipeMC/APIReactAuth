@@ -4,7 +4,7 @@ import {
     CardText, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Row, Col
 } from "reactstrap";
 import {
-    BsPlusLg, BsSearch, BsBasketFill, BsBoxSeam,
+    BsPlusLg, BsSearch, BsBasketFill, BsBoxSeam, BsExclamationOctagon,
     BsListStars, BsInboxesFill, BsTable, BsPencilFill, BsFillTrashFill
 } from "react-icons/bs";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
@@ -56,7 +56,7 @@ export class Movement extends Component {
 
         authService.getAccessToken().then(
             (token) => {
-                console.log("Token en GET: "+token);
+                console.log("Token en GET: " + token);
                 const options = {
                     headers: !token ? {} : {
                         'Authorization': `Bearer ${token}`
@@ -188,6 +188,10 @@ export class Movement extends Component {
         this.setState({ accion: 1 });
     }
 
+    mostrarError = () => {
+        this.setState({ accion: 4 });
+    }
+
     //Updates state values when inputs  
     handleChange = (event) => {
         this.setState({ [event.target.name]: event.target.value });
@@ -235,6 +239,9 @@ export class Movement extends Component {
                                     allMoves.push(movimiento);
                                     this.componentDidMount();
                                     this.mitoggle();
+                                } else {
+                                    this.mitoggle();
+                                    this.mostrarError();
                                 }
                             }
                         );
@@ -642,6 +649,27 @@ export class Movement extends Component {
                                                 {' '}
                                                 <Button onClick={this.mitoggle}>
                                                     Cancelar
+                                                </Button>
+                                            </ModalFooter>
+                                        </Modal>
+
+                                        <Modal
+                                            isOpen={this.state.accion === 4 && true}
+                                            centered
+                                            toggle={this.mitoogle}
+                                        >
+
+                                            <ModalHeader className="text-dark" toggle={this.mitoogle} style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
+                                                Error
+                                            </ModalHeader>
+                                            <ModalBody className="text-dark text-center" >
+                                                <h1><BsExclamationOctagon /></h1>
+                                                A ocurrido un error al agregar el movimiento
+                                            </ModalBody>
+                                            <ModalFooter>
+                                                {' '}
+                                                <Button onClick={this.mitoggle}>
+                                                    Cerrar
                                                 </Button>
                                             </ModalFooter>
                                         </Modal>
