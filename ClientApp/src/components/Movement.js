@@ -56,6 +56,7 @@ export class Movement extends Component {
 
         authService.getAccessToken().then(
             (token) => {
+                console.log("Token en GET: "+token);
                 const options = {
                     headers: !token ? {} : {
                         'Authorization': `Bearer ${token}`
@@ -214,6 +215,7 @@ export class Movement extends Component {
 
             authService.getAccessToken().then(
                 (token) => {
+                    console.log("Token en POST: " + token);
                     const options = {
                         method: "POST",
                         headers: !token ? {} : {
@@ -222,7 +224,7 @@ export class Movement extends Component {
                         },
                         body: JSON.stringify(movimiento)
                     }
-                    fetch('/api/movements?productId=' + this.state.productId + "&quantity=" + this.state.quantity, options)
+                    fetch('api/movements?productId=' + this.state.productId + "&quantity=" + this.state.quantity, options)
                         .then(
                             (response) => { return response.status; }
                         ).then(

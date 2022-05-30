@@ -52,13 +52,13 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RequireAdminRole", policy =>
-    {
-        policy.RequireClaim(ClaimTypes.Role, new String[] { "ADMINISTRADOR" });
-    });
     options.AddPolicy("AllRole", policy =>
     {
         policy.RequireClaim(ClaimTypes.Role, new String[] { "ADMINISTRADOR", "GERENTE" });
+    });
+    options.AddPolicy("RequireAdminRole", policy =>
+    {
+        policy.RequireClaim(ClaimTypes.Role, new String[] { "ADMINISTRADOR" });
     });
 });
 

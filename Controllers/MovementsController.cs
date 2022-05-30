@@ -27,7 +27,7 @@ namespace InventoryWebApi.Controllers
             {
                 return NotFound();
             }
-            return await _context.Movements.OrderByDescending(x => x.Date).Take(20).ToListAsync();
+            return await _context.Movements.OrderByDescending(x => x.MovementId).Take(20).ToListAsync();
         }
 
         // GET: api/Movements/5
