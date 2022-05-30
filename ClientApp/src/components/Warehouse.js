@@ -45,7 +45,6 @@ export class Warehouse extends Component {
 
         authService.getAccessToken().then(
             (token) => {
-                
                 const options = {
                     headers: !token ? {} : {
                         'Authorization': `Bearer ${token}`
@@ -112,7 +111,6 @@ export class Warehouse extends Component {
     create = (warehouse) => {
         authService.getAccessToken().then(
             (token) => {
-                
                 const options = {
                     method: "POST",
                     headers: !token ? {} : {
@@ -140,33 +138,6 @@ export class Warehouse extends Component {
                 );
             }
         )
-
-        /*const options = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(warehouse)
-        };
-
-        fetch('/api/warehouses', options)
-            .then(
-                (response) => { return response.status; }
-            ).then(
-                (code) => {
-                    if (code == 201) {
-                        console.log(code);
-                        const warehouses = Array.from(this.state.data);
-                        warehouses.push({
-                            warehouseId: warehouse.warehouseId,
-                            description: warehouse.description,
-                            address: warehouse.address
-                        });
-                        this.componentDidMount();
-                        this.mitoggle();
-                    }
-                }
-            );*/
     }
 
     editar = (item) => {
@@ -196,14 +167,6 @@ export class Warehouse extends Component {
     }
 
     edit = (warehouse) => {
-        /*const options = {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(warehouse)
-        };*/
-
         authService.getAccessToken().then(
             (token) => {
                 
