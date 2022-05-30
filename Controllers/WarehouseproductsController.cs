@@ -83,7 +83,7 @@ namespace InventoryWebApi.Controllers
 
         // POST: api/Warehouseproducts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "AllRole")]
         [HttpPost]
         public async Task<ActionResult<Warehouseproduct>> PostWarehouseproduct(Warehouseproduct warehouseproduct)
         {

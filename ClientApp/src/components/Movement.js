@@ -56,18 +56,12 @@ export class Movement extends Component {
 
         authService.getAccessToken().then(
             (token) => {
-
                 const options = {
-                    method: "GET",
-                    headers: {
-                        headers: !token ? {} : {
-                            'Authorization': `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        }
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
                     }
-                };
-
-                fetch('/api/movements').then((response) => {
+                }
+                fetch('/api/movements', options).then((response) => {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ data: dataApi })
@@ -75,45 +69,90 @@ export class Movement extends Component {
                 }).catch(function (error) {
                     console.log(error);
                 });
+            }
+        )
 
-                //GET supplies data
-                fetch('/api/suppliers').then((response) => {
+        //GET supplies data
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/suppliers', options).then((response) => {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ suppliers: dataApi })
                 }).catch(function (error) {
                     console.log(error);
                 })
+            }
+        )
 
-                //GET campanies data
-                fetch('/api/companies').then((response) => {
+        //GET campanies data
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/companies', options).then((response) => {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ companies: dataApi })
                 }).catch(function (error) {
                     console.log(error);
                 })
+            }
+        )
 
-                //GET employees data
-                fetch('/api/employees').then((response) => {
+        //GET employees data
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/employees', options).then((response) => {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ employees: dataApi })
                 }).catch(function (error) {
                     console.log(error);
                 })
+            }
+        )
 
-                //GET warehouses data
-                fetch('/api/warehouses').then((response) => {
+        //GET warehouses data
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/warehouses', options).then((response) => {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ warehouses: dataApi })
                 }).catch(function (error) {
                     console.log(error);
                 })
+            }
+        )
 
-                //GET products data
-                fetch('/api/products').then((response) => {
+        //GET products data
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/products', options).then((response) => {
                     return response.json();
                 }).then((dataApi) => {
                     this.setState({ products: dataApi })
@@ -121,10 +160,8 @@ export class Movement extends Component {
                 }).catch(function (error) {
                     console.log(error);
                 })
-
             }
         )
-
     }
 
     //Close modal, restores state values
@@ -175,128 +212,158 @@ export class Movement extends Component {
 
             movimiento.date = fecha;
 
-            const options = {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(movimiento)
-            };
-
-            fetch('/api/movements?productId='+this.state.productId+"&quantity="+this.state.quantity, options)
-                .then(
-                    (response) => { return response.status; }
-                ).then(
-                    (code) => {
-                        if (code === 201) {
-                            console.log(code);
-                            const allMoves = Array.from(this.state.data);
-                            allMoves.push(movimiento);
-                            this.componentDidMount();
-                            this.mitoggle();
-                        }
+            authService.getAccessToken().then(
+                (token) => {
+                    const options = {
+                        method: "POST",
+                        headers: !token ? {} : {
+                            'Authorization': `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(movimiento)
                     }
-                );
+                    fetch('/api/movements?productId=' + this.state.productId + "&quantity=" + this.state.quantity, options)
+                        .then(
+                            (response) => { return response.status; }
+                        ).then(
+                            (code) => {
+                                if (code === 201) {
+                                    console.log(code);
+                                    const allMoves = Array.from(this.state.data);
+                                    allMoves.push(movimiento);
+                                    this.componentDidMount();
+                                    this.mitoggle();
+                                }
+                            }
+                        );
+                }
+            )
         }
         else if (this.state.accion === 2) {
             movimiento.movementId = this.state.movementId
             movimiento.date = fecha;
             movimiento.companyId = this.state.compania;
 
-            const options = {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(movimiento)
-            };
-
-            fetch('/api/movements/' + this.state.movEditable.movementId, options)
-                .then(
-                    (response) => { return response.status; }
-                ).then(
-                    (code) => {
-                        console.log(code);
-                        if (code === 204) {
-                            console.log(code);
-                            const allMoves = Array.from(this.state.data);
-                            allMoves.push(movimiento);
-                            this.componentDidMount();
-                            this.mitoggle();
-                        }
+            authService.getAccessToken().then(
+                (token) => {
+                    const options = {
+                        method: "PUT",
+                        headers: !token ? {} : {
+                            'Authorization': `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(movimiento)
                     }
-                );
+                    fetch('/api/movements/' + this.state.movEditable.movementId, options)
+                        .then(
+                            (response) => { return response.status; }
+                        ).then(
+                            (code) => {
+                                console.log(code);
+                                if (code === 204) {
+                                    console.log(code);
+                                    const allMoves = Array.from(this.state.data);
+                                    allMoves.push(movimiento);
+                                    this.componentDidMount();
+                                    this.mitoggle();
+                                }
+                            }
+                        );
+                }
+            )
         }
         else if (this.state.accion === 3) {
 
             movimiento.movementId = this.state.movementId
             movimiento.companyId = this.state.compania;
 
-            const options = {
-                method: "DELETE"
-            };
-
-            fetch('/api/movements/' + this.state.movEditable.movementId, options)
-                .then(
-                    (response) => { return response.status; }
-                ).then(
-                    (code) => {
-                        console.log("El código es: " + code);
-                        if (code === 204 || code === 200) {
-                            console.log(code);
-                            const allMoves = Array.from(this.state.data);
-                            allMoves.pop(movimiento);
-                            this.componentDidMount();
-                            this.mitoggle();
+            authService.getAccessToken().then(
+                (token) => {
+                    const options = {
+                        method: "DELETE",
+                        headers: !token ? {} : {
+                            'Authorization': `Bearer ${token}`
                         }
                     }
-                );
+                    fetch('/api/movements/' + this.state.movEditable.movementId, options)
+                        .then(
+                            (response) => { return response.status; }
+                        ).then(
+                            (code) => {
+                                console.log("El código es: " + code);
+                                if (code === 204 || code === 200) {
+                                    console.log(code);
+                                    const allMoves = Array.from(this.state.data);
+                                    allMoves.pop(movimiento);
+                                    this.componentDidMount();
+                                    this.mitoggle();
+                                }
+                            }
+                        );
+                }
+            )
         }
 
     }
 
     editar = (item) => {
-
-        fetch('/api/movements/' + item.movementId)
-            .then(response => { return response.json() })
-            .then(o => {
-                console.log("primer fetch " + o);
-                this.setState({
-                    accion: 2,
-                    movementId: o.movementId,
-                    dateMov: o.date.slice(0, 10),
-                    provName: o.supplierId,//foranea
-                    sourceWare: o.originWarehouseId,//foranea
-                    targetWare: o.targetWarehouseId,//foranea
-                    typeMov: o.type,
-                    notesMov: o.notes,
-                    empId: o.employeeId,//foranea
-                    compania: o.companyId,
-                    movEditable: o,
-                });
-            });
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/movements/' + item.movementId, options)
+                    .then(response => { return response.json() })
+                    .then(o => {
+                        console.log("primer fetch " + o);
+                        this.setState({
+                            accion: 2,
+                            movementId: o.movementId,
+                            dateMov: o.date.slice(0, 10),
+                            provName: o.supplierId,//foranea
+                            sourceWare: o.originWarehouseId,//foranea
+                            targetWare: o.targetWarehouseId,//foranea
+                            typeMov: o.type,
+                            notesMov: o.notes,
+                            empId: o.employeeId,//foranea
+                            compania: o.companyId,
+                            movEditable: o,
+                        });
+                    });
+            }
+        )
     }
 
     eliminar = (item) => {
-
-        fetch('/api/movements/' + item.movementId)
-            .then(response => { return response.json() })
-            .then(o => {
-                console.log(o);
-                this.setState({
-                    accion: 3,
-                    movementId: o.movementId,
-                    dateMov: o.date.slice(0, 10),
-                    provName: o.supplierId,//foranea
-                    sourceWare: o.originWarehouseId,//foranea
-                    targetWare: o.targetWarehouseId,//foranea
-                    typeMov: o.type,
-                    notesMov: o.notes,
-                    empId: o.employeeId,//foranea
-                    compania: o.companyId,
-                    movEditable: o,
-                });
-            });
+        authService.getAccessToken().then(
+            (token) => {
+                const options = {
+                    headers: !token ? {} : {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+                fetch('/api/movements/' + item.movementId, options)
+                    .then(response => { return response.json() })
+                    .then(o => {
+                        console.log(o);
+                        this.setState({
+                            accion: 3,
+                            movementId: o.movementId,
+                            dateMov: o.date.slice(0, 10),
+                            provName: o.supplierId,//foranea
+                            sourceWare: o.originWarehouseId,//foranea
+                            targetWare: o.targetWarehouseId,//foranea
+                            typeMov: o.type,
+                            notesMov: o.notes,
+                            empId: o.employeeId,//foranea
+                            compania: o.companyId,
+                            movEditable: o,
+                        });
+                    });
+            }
+        )
     }
 
     render() {
@@ -469,7 +536,7 @@ export class Movement extends Component {
                                                         <Col md={4}>
                                                             <FormGroup>
                                                                 <label for="quantity">Cantidad</label>
-                                                                <input id="quantity" name="quantity" type="number" className="form-control mb-3"  onChange={this.handleChange} value={this.state.quantity} />
+                                                                <input id="quantity" name="quantity" type="number" className="form-control mb-3" onChange={this.handleChange} value={this.state.quantity} />
                                                             </FormGroup>
                                                         </Col>
 
